@@ -1,0 +1,13 @@
+{
+    "name": "Alibi",
+    "short_name": "Alibi",
+    "version": "1.0.0",
+    "manifest_version": 2,
+    "description": "いつどこで何をしていたのか自動で記録してくれるタイムトラッキングアプリ",
+    "content_scripts": [{
+      "matches": [ "http://*/*", "https://*/*" ],
+      "js": [
+        "content.js"
+      ]
+    }]
+  }
