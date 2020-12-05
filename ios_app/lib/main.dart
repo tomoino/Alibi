@@ -1,15 +1,22 @@
 import 'package:flutter/material.dart';
 
+import "dart:async";
+import 'package:chopper/chopper.dart';
+
+import 'chopper_client_creator.dart';
+import 'event_service.dart';
+
 void main() {
   runApp(MyApp());
 }
 
+// Root Widget
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Alibi',
       theme: ThemeData(
         // This is the theme of your application.
         //
@@ -22,11 +29,12 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
+      home: MyHomePage(title: 'Alibi'),
     );
   }
 }
 
+// Home Widget
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key key, this.title}) : super(key: key);
 
@@ -45,18 +53,52 @@ class MyHomePage extends StatefulWidget {
   _MyHomePageState createState() => _MyHomePageState();
 }
 
+// Home WidgetのState
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+  var _res;
+  // API通信
+  final EventService service =
+      EventService.create(ChopperClientCreator.create());
 
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
+  Future _getData() async {
+    final response = await service.getEventById("1");
+    if (response.isSuccessful) {
+      // successful request
+      // final body = response.body;
+
+      final body = response.body as Map<String, dynamic>;
+      setState(() {
+        //状態が変化した場合によばれる
+        _res = body; //Map->Listに必要な情報だけ格納
+      });
+    } else {
+      // error from server
+      final code = response.statusCode;
+      _res = "error: $code";
+      // final error = response.error;
+    }
+  }
+
+  Future _updateData() async {
+    Map<String, dynamic> _postData = {..._res};
+    _postData["Location"] = "自室";
+    _postData["Event"] = "寝る";
+
+    final response =
+        await service.updateEventById(_postData["Id"].toString(), _postData);
+
+    if (response.isSuccessful) {
+      setState(() {
+        //表示する値も更新
+        _res = _postData; //Map->Listに必要な情報だけ格納
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _getData();
   }
 
   @override
@@ -94,18 +136,19 @@ class _MyHomePageState extends State<MyHomePage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Text(
-              'You have pushed the button this many times:',
+              'Hello World',
             ),
             Text(
-              '$_counter',
+              '$_res',
+              // '$_counter',
               style: Theme.of(context).textTheme.headline4,
             ),
           ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
+        onPressed: _updateData,
+        tooltip: 'Update Data',
         child: Icon(Icons.add),
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
