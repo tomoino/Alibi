@@ -56,17 +56,19 @@ class MyHomePage extends StatefulWidget {
 // Home WidgetのState
 class _MyHomePageState extends State<MyHomePage> {
   var _res;
+  // API通信
+  final EventService service =
+      EventService.create(ChopperClientCreator.create());
+
   Future _getData() async {
-    // API通信
-    final EventService service =
-        EventService.create(ChopperClientCreator.create());
     final response = await service.getEventById("1");
     if (response.isSuccessful) {
       // successful request
       // final body = response.body;
 
       final body = response.body as Map<String, dynamic>;
-      setState(() { //状態が変化した場合によばれる
+      setState(() {
+        //状態が変化した場合によばれる
         _res = body; //Map->Listに必要な情報だけ格納
       });
     } else {
@@ -75,6 +77,40 @@ class _MyHomePageState extends State<MyHomePage> {
       _res = "error: $code";
       // final error = response.error;
     }
+  }
+
+  Future _updateData() async {
+    Map<String, dynamic> _postData = {..._res};
+    _postData["Location"] = "自室";
+    _postData["Event"] = "寝たい";
+    
+    final response = await service.updateEventById(_postData["Id"].toString(), _postData);
+
+    //   if (response.statusCode != 200) {
+    //   setState(() {
+    //     int statusCode = response.statusCode;
+    //     _content = "Failed to post $statusCode";
+    //   });
+    //   return;
+    // }
+    // setState(() {
+    //   _content = response.body;
+    // });
+
+    // if (response.isSuccessful) {
+    //   // successful request
+    //   // final body = response.body;
+
+    //   final body = response.body as Map<String, dynamic>;
+    //   setState(() { //状態が変化した場合によばれる
+    //     _res = body; //Map->Listに必要な情報だけ格納
+    //   });
+    // } else {
+    //   // error from server
+    //   final code = response.statusCode;
+    //   _res = "error: $code";
+    //   // final error = response.error;
+    // }
   }
 
   @override
@@ -142,8 +178,8 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _getData,
-        tooltip: 'Increment',
+        onPressed: _updateData,
+        tooltip: 'Update Data',
         child: Icon(Icons.add),
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );

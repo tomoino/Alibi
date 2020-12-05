@@ -19,4 +19,11 @@ class _$EventService extends EventService {
     final $request = Request('GET', $url, client.baseUrl);
     return client.send<dynamic, dynamic>($request);
   }
+
+  Future<Response> updateEventById(String id, dynamic eventForm) {
+    final $url = '/update/${id}';
+    final $body = eventForm;
+    final $request = Request('POST', $url, client.baseUrl, body: $body);
+    return client.send<dynamic, dynamic>($request);
+  }
 }

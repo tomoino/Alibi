@@ -16,6 +16,7 @@ abstract class EventService extends ChopperService {
 
   // @Post(path: '/create')
 
-  // @Post(path: '/update/{id}')
+  @Post(path: '/update/{id}')
+  Future<Response> updateEventById(@Path() String id, @Body() Map<String, dynamic> eventForm);
   
 }
