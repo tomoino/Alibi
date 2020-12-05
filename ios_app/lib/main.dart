@@ -82,10 +82,17 @@ class _MyHomePageState extends State<MyHomePage> {
   Future _updateData() async {
     Map<String, dynamic> _postData = {..._res};
     _postData["Location"] = "自室";
-    _postData["Event"] = "寝たい";
-    
-    final response = await service.updateEventById(_postData["Id"].toString(), _postData);
+    _postData["Event"] = "寝る";
 
+    final response =
+        await service.updateEventById(_postData["Id"].toString(), _postData);
+
+    if (response.isSuccessful) {
+      setState(() {
+        //表示する値も更新
+        _res = _postData; //Map->Listに必要な情報だけ格納
+      });
+    }
     //   if (response.statusCode != 200) {
     //   setState(() {
     //     int statusCode = response.statusCode;
