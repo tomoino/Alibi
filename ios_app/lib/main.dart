@@ -55,21 +55,34 @@ class MyHomePage extends StatefulWidget {
 
 // Home WidgetのState
 class _MyHomePageState extends State<MyHomePage> {
-  
-  void _callApi() async {
+  var _res;
+  Future _getData() async {
     // API通信
-    final EventService service = EventService.create(ChopperClientCreator.create());
+    final EventService service =
+        EventService.create(ChopperClientCreator.create());
     final response = await service.getEventById("1");
     if (response.isSuccessful) {
       // successful request
-      final body = response.body;
+      // final body = response.body;
+
+      final body = response.body as Map<String, dynamic>;
+      setState(() { //状態が変化した場合によばれる
+        _res = body; //Map->Listに必要な情報だけ格納
+      });
     } else {
       // error from server
       final code = response.statusCode;
+      _res = "error: $code";
       // final error = response.error;
     }
   }
-  
+
+  @override
+  void initState() {
+    super.initState();
+    _getData();
+  }
+
   int _counter = 0;
 
   void _incrementCounter() {
@@ -121,14 +134,15 @@ class _MyHomePageState extends State<MyHomePage> {
               'Hello World',
             ),
             Text(
-              '$_counter',
+              '$_res',
+              // '$_counter',
               style: Theme.of(context).textTheme.headline4,
             ),
           ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
+        onPressed: _getData,
         tooltip: 'Increment',
         child: Icon(Icons.add),
       ), // This trailing comma makes auto-formatting nicer for build methods.
@@ -198,6 +212,6 @@ class _MyHomePageState extends State<MyHomePage> {
   //       child: Icon(Icons.add),
   //     ), // This trailing comma makes auto-formatting nicer for build methods.
   //   );
-  // } 
+  // }
 
 }
