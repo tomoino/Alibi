@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import "dart:async";
-import 'package:chopper/chopper.dart';
 
 import 'chopper_client_creator.dart';
 import 'event_service.dart';
