@@ -19,6 +19,8 @@
 		B8B11C6A257F55D2003CAA1D /* EventRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8B11C69257F55D2003CAA1D /* EventRowView.swift */; };
 		B8B11C6F257F5615003CAA1D /* ApiClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8B11C6E257F5615003CAA1D /* ApiClient.swift */; };
 		B8B11C74257F56E1003CAA1D /* EventDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8B11C73257F56E1003CAA1D /* EventDetailView.swift */; };
+		B8B11C8F2580AD0E003CAA1D /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B8B11C8E2580AD0E003CAA1D /* CoreLocation.framework */; };
+		B8B11C942580AED1003CAA1D /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8B11C932580AED1003CAA1D /* LocationManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -57,6 +59,8 @@
 		B8B11C69257F55D2003CAA1D /* EventRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventRowView.swift; sourceTree = "<group>"; };
 		B8B11C6E257F5615003CAA1D /* ApiClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApiClient.swift; sourceTree = "<group>"; };
 		B8B11C73257F56E1003CAA1D /* EventDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventDetailView.swift; sourceTree = "<group>"; };
+		B8B11C8E2580AD0E003CAA1D /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
+		B8B11C932580AED1003CAA1D /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -64,6 +68,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B8B11C8F2580AD0E003CAA1D /* CoreLocation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -91,6 +96,7 @@
 				B83BC9C6257F4F4200D2D252 /* AlibiTests */,
 				B83BC9D1257F4F4200D2D252 /* AlibiUITests */,
 				B83BC9AE257F4F4100D2D252 /* Products */,
+				B8B11C8D2580AD0E003CAA1D /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -168,8 +174,17 @@
 			isa = PBXGroup;
 			children = (
 				B8B11C6E257F5615003CAA1D /* ApiClient.swift */,
+				B8B11C932580AED1003CAA1D /* LocationManager.swift */,
 			);
 			path = Lib;
+			sourceTree = "<group>";
+		};
+		B8B11C8D2580AD0E003CAA1D /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				B8B11C8E2580AD0E003CAA1D /* CoreLocation.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -306,6 +321,7 @@
 				B83BC9B1257F4F4100D2D252 /* AppDelegate.swift in Sources */,
 				B8B11C6A257F55D2003CAA1D /* EventRowView.swift in Sources */,
 				B83BC9B3257F4F4100D2D252 /* SceneDelegate.swift in Sources */,
+				B8B11C942580AED1003CAA1D /* LocationManager.swift in Sources */,
 				B8B11C74257F56E1003CAA1D /* EventDetailView.swift in Sources */,
 				B83BC9B5257F4F4100D2D252 /* ContentView.swift in Sources */,
 				B8B11C60257F54BF003CAA1D /* Event.swift in Sources */,
