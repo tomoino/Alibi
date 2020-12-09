@@ -9,12 +9,18 @@ import SwiftUI
 
 struct ContentView: View {
     // ObservableObject に準拠したクラスを監視
-    @ObservedObject var fetcher = EventFetcher()
+//    @ObservedObject var fetcher = ApiClient()
+//    var eventData: [Event]
+    @ObservedObject var apiClient = ApiClient()
 
+    init(){
+        apiClient.getAllEvents()
+    }
+    
     var body: some View {
         NavigationView {
             // 通信クラスの eventData プロパティを設定
-            List(fetcher.eventData) { event in
+            List(apiClient.eventData) { event in
                 NavigationLink(destination: EventDetailView(eventData: event)) {
                     EventRowView(eventData: event)
                 }

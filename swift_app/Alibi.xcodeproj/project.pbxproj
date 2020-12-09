@@ -17,7 +17,7 @@
 		B83BC9D3257F4F4200D2D252 /* AlibiUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B83BC9D2257F4F4200D2D252 /* AlibiUITests.swift */; };
 		B8B11C60257F54BF003CAA1D /* Event.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8B11C5F257F54BF003CAA1D /* Event.swift */; };
 		B8B11C6A257F55D2003CAA1D /* EventRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8B11C69257F55D2003CAA1D /* EventRowView.swift */; };
-		B8B11C6F257F5615003CAA1D /* EventFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8B11C6E257F5615003CAA1D /* EventFetcher.swift */; };
+		B8B11C6F257F5615003CAA1D /* ApiClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8B11C6E257F5615003CAA1D /* ApiClient.swift */; };
 		B8B11C74257F56E1003CAA1D /* EventDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8B11C73257F56E1003CAA1D /* EventDetailView.swift */; };
 /* End PBXBuildFile section */
 
@@ -55,7 +55,7 @@
 		B83BC9D4257F4F4200D2D252 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B8B11C5F257F54BF003CAA1D /* Event.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Event.swift; sourceTree = "<group>"; };
 		B8B11C69257F55D2003CAA1D /* EventRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventRowView.swift; sourceTree = "<group>"; };
-		B8B11C6E257F5615003CAA1D /* EventFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventFetcher.swift; sourceTree = "<group>"; };
+		B8B11C6E257F5615003CAA1D /* ApiClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApiClient.swift; sourceTree = "<group>"; };
 		B8B11C73257F56E1003CAA1D /* EventDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventDetailView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -167,7 +167,7 @@
 		B8B11C7A257F58E7003CAA1D /* Lib */ = {
 			isa = PBXGroup;
 			children = (
-				B8B11C6E257F5615003CAA1D /* EventFetcher.swift */,
+				B8B11C6E257F5615003CAA1D /* ApiClient.swift */,
 			);
 			path = Lib;
 			sourceTree = "<group>";
@@ -302,7 +302,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B8B11C6F257F5615003CAA1D /* EventFetcher.swift in Sources */,
+				B8B11C6F257F5615003CAA1D /* ApiClient.swift in Sources */,
 				B83BC9B1257F4F4100D2D252 /* AppDelegate.swift in Sources */,
 				B8B11C6A257F55D2003CAA1D /* EventRowView.swift in Sources */,
 				B83BC9B3257F4F4100D2D252 /* SceneDelegate.swift in Sources */,

@@ -8,15 +8,58 @@
 import SwiftUI
 
 struct EventDetailView: View {
-    var eventData: Event    // From ListView(静的モデル)
-    @State private var zoomValue = 0.01
+    var eventData: Event
+    
+    @State var inputEmail: String = ""
+    @State var inputPassword: String = ""
+    @ObservedObject var apiClient = ApiClient()
+    
+        var body: some View {
+            NavigationView {
+                VStack(alignment: .center) {
+                    Text("SwiftUI App")
+                        .font(.system(size: 48,
+                                      weight: .heavy))
 
-    var body: some View {
-        ScrollView {
-            
+                    VStack(spacing: 24) {
+                        TextField("Mail address", text: $inputEmail)
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                            .frame(maxWidth: 280)
+
+                        SecureField("Password", text: $inputPassword)
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                            .frame(maxWidth: 280)
+
+                    }
+                    .frame(height: 200)
+
+                    Button(action: {
+                       print("Login処理")
+                        apiClient.updateEvent()
+                    },
+                    label: {
+                        Text("Login")
+                            .fontWeight(.medium)
+                            .frame(minWidth: 160)
+                            .foregroundColor(.white)
+                            .padding(12)
+                            .background(Color.accentColor)
+                            .cornerRadius(8)
+                    })
+
+                    Spacer()
+                }
+            }
         }
-        .navigationBarTitle("Event Detail", displayMode: .inline)
-    }
+    //ListView(静的モデル)
+//    @State private var zoomValue = 0.01
+//
+//    var body: some View {
+//        ScrollView {
+//
+//        }
+//        .navigationBarTitle("Event Detail", displayMode: .inline)
+//    }
 }
 
 struct EventDetailView_Previews: PreviewProvider {
