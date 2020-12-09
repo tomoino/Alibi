@@ -90,22 +90,24 @@ extension LocationManager: CLLocationManagerDelegate {
         
         let date = Date()
         let calendar = Calendar.current
+        let hour = calendar.component(.hour, from: date)
         let minute = calendar.component(.minute, from: date)
         let second = calendar.component(.second, from: date)
         
         let apiClient = ApiClient()
         let event = Event(id: 1,
                  time: "",
-                 location: "",
-                 event: "",
+                 location: "どこか",
+                 event: "GPSのテスト",
                  created_at: "",
                  updated_at: "",
                  longitude: self.lastLocation?.coordinate.longitude ?? 0,
                  latitude: self.lastLocation?.coordinate.latitude ?? 0
                  )
         
-        if (minute % 10 == 0 && second == 0) {
-            apiClient.updateEvent(event: event)
+//        if (minute % 10 == 0 && second == 0) {
+          if (minute % 30 == 0 && second == 0 && hour > 7 && hour < 21) { // 一時的に時間制限をつけてデータを集める
+            apiClient.createEvent(event: event)
         }
     }
 

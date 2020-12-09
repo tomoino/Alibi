@@ -40,6 +40,23 @@ class ApiClient: ObservableObject {
             }
         })
         task.resume()
+    }
+    
+    func createEvent(event: Event) {
+        guard let url = URL(string: baseUrl + "/create") else { return }
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        let postParameters = "Location=\(event.location)&Event=\(event.event)&Latitude=\(event.latitude)&Longitude=\(event.longitude)"
+        print(postParameters)
         
+        request.httpBody = postParameters.data(using: String.Encoding.utf8)
+        
+        let task = URLSession.shared.dataTask(with: request, completionHandler: { (data, response, error) in
+            if error != nil {
+               print("error is \(String(describing: error))")
+               return
+            }
+        })
+        task.resume()
     }
 }
