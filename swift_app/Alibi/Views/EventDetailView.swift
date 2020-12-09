@@ -35,7 +35,7 @@ struct EventDetailView: View {
 
                     Button(action: {
                        print("Login処理")
-                        apiClient.updateEvent(event: eventData)
+                       apiClient.updateEvent(event: eventData)
                     },
                     label: {
                         Text("Login")

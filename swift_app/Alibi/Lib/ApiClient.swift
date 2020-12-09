@@ -28,7 +28,7 @@ class ApiClient: ObservableObject {
         guard let url = URL(string: baseUrl + "/update/\(event.id)") else { return }
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
-        let postParameters = "Id=\(event.id)&Location=\(event.location)&Event=\(event.event)"
+        let postParameters = "Id=\(event.id)&Location=\(event.location)&Event=\(event.event)&Latitude=\(event.latitude)&Longitude=\(event.longitude)"
         print(postParameters)
         
         request.httpBody = postParameters.data(using: String.Encoding.utf8)
