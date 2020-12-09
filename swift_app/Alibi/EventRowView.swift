@@ -19,18 +19,21 @@ struct EventRowView: View {
                 .lineLimit(2)
                 .padding(Edge.Set.top, 8.0)
                 .padding(Edge.Set.bottom, 12.0)
+            
+            HStack {
+                Image(systemName: "person.fill")
+                    .imageScale(.medium)
+                    .foregroundColor(.red)
+                Text("id \(eventData.id)" ).font(.footnote)
+            }.padding(Edge.Set.bottom, 6.0)
+            
             HStack {
                 Image(systemName: "calendar")
                     .imageScale(.medium)
                     .foregroundColor(.red)
                 Text(eventData.time).font(.footnote)
             }.padding(Edge.Set.bottom, 6.0)
-            HStack {
-                Image(systemName: "person.fill")
-                    .imageScale(.medium)
-                    .foregroundColor(.red)
-                Text("場所："+eventData.location ).font(.footnote)
-            }.padding(Edge.Set.bottom, 6.0)
+            
             HStack {
                 Image(systemName: "mappin.and.ellipse")
                     .imageScale(.medium)

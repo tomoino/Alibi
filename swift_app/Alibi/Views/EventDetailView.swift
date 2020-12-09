@@ -35,7 +35,7 @@ struct EventDetailView: View {
 
                     Button(action: {
                        print("Login処理")
-                        apiClient.updateEvent()
+                        apiClient.updateEvent(event: eventData)
                     },
                     label: {
                         Text("Login")
@@ -51,15 +51,6 @@ struct EventDetailView: View {
                 }
             }
         }
-    //ListView(静的モデル)
-//    @State private var zoomValue = 0.01
-//
-//    var body: some View {
-//        ScrollView {
-//
-//        }
-//        .navigationBarTitle("Event Detail", displayMode: .inline)
-//    }
 }
 
 struct EventDetailView_Previews: PreviewProvider {

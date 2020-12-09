@@ -9,8 +9,6 @@ import SwiftUI
 
 struct ContentView: View {
     // ObservableObject に準拠したクラスを監視
-//    @ObservedObject var fetcher = ApiClient()
-//    var eventData: [Event]
     @ObservedObject var apiClient = ApiClient()
 
     init(){
