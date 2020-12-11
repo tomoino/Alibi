@@ -12,14 +12,22 @@ import Combine
 class LocationManager: NSObject, ObservableObject {
     
     var beaconRegion : CLBeaconRegion!
-    var beacon1: Int
-    var beacon2: Int
-    var beacon3: Int
+    var beaconRssi1: Int
+    var beaconRssi2: Int
+    var beaconRssi3: Int
+    var beaconMaxRssi1: Int
+    var beaconMaxRssi2: Int
+    var beaconMaxRssi3: Int
 
     override init() {
-        self.beacon1 = 0
-        self.beacon2 = 0
-        self.beacon3 = 0
+        self.beaconRssi1 = 0
+        self.beaconRssi2 = 0
+        self.beaconRssi3 = 0
+        
+        self.beaconMaxRssi1 = -1000
+        self.beaconMaxRssi2 = -1000
+        self.beaconMaxRssi3 = -1000
+        
         super.init()
         self.locationManager.delegate = self
         self.locationManager.allowsBackgroundLocationUpdates = true; // バックグランドモードで使用する場合YESにする必要がある
@@ -141,17 +149,30 @@ extension LocationManager: CLLocationManagerDelegate {
             if(beacons.count > 0){
                 for i in 0 ..< beacons.count {
                     let beacon = beacons[i]
-                    let rssi = beacon.rssi;
                     print("minor:\(beacon.minor), rssi: \(beacon.rssi)")
                     
+                    // 検知できたビーコンのフラグを立てる
+                    if beacon.rssi != 0 {
+                        if beacon.minor == 1000 && beacon.rssi > self.beaconMaxRssi1 {
+                            self.beaconMaxRssi1 = beacon.rssi
+                        }
+                        if beacon.minor == 2000 && beacon.rssi > self.beaconMaxRssi2 {
+                            self.beaconMaxRssi2 = beacon.rssi
+                        }
+                        if beacon.minor == 3000 && beacon.rssi > self.beaconMaxRssi3 {
+                            self.beaconMaxRssi3 = beacon.rssi
+                        }
+                    }
+                    
+                    // debug用にrssiの値を保存する
                     if beacon.minor == 1000 {
-                        self.beacon1 = beacon.rssi
+                        self.beaconRssi1 = beacon.rssi
                     }
                     if beacon.minor == 2000 {
-                        self.beacon2 = beacon.rssi
+                        self.beaconRssi2 = beacon.rssi
                     }
                     if beacon.minor == 3000 {
-                        self.beacon3 = beacon.rssi
+                        self.beaconRssi3 = beacon.rssi
                     }
                 }
             }
@@ -161,7 +182,6 @@ extension LocationManager: CLLocationManagerDelegate {
         guard let location = locations.last else { return }
         self.lastLocation = location
         print(#function, location)
-        print("Location: (\(self.beacon1),\(self.beacon2),\(self.beacon3))")
         
         let date = Date()
         let calendar = Calendar.current
@@ -169,20 +189,36 @@ extension LocationManager: CLLocationManagerDelegate {
         let minute = calendar.component(.minute, from: date)
         let second = calendar.component(.second, from: date)
         
-        let apiClient = ApiClient()
-        let event = Event(id: 1,
-                 time: "",
-                 location: "どこか",
-                 event: "GPSのテスト",
-                 created_at: "",
-                 updated_at: "",
-                 longitude: self.lastLocation?.coordinate.longitude ?? 0,
-                 latitude: self.lastLocation?.coordinate.latitude ?? 0
-                 )
+        if (minute % 10 == 0 && second == 0 && hour > 11 && hour < 23) { // 10分間隔で実行 // 一時的に12〜22.5時まで
+            let apiClient = ApiClient()
+            var event = Event(id: 1,
+                     time: "",
+                     location: "",
+                     event: "GPSのテスト",
+                     created_at: "",
+                     updated_at: "",
+                     longitude: self.lastLocation?.coordinate.longitude ?? 0,
+                     latitude: self.lastLocation?.coordinate.latitude ?? 0
+                     )
         
-//        if (minute % 10 == 0 && second == 0) {
-//          if (minute % 30 == 0 && second == 0 && hour > 7 && hour < 21) { // 一時的に時間制限をつけてデータを集める
-//            apiClient.createEvent(event: event)
-//        }
+            let maxRssis = [self.beaconMaxRssi1,self.beaconMaxRssi2,self.beaconMaxRssi3]
+            let maxRssiValue = maxRssis.max() ?? 0
+            if maxRssiValue > -1000 { // beaconが検出された場合
+                let maxRssiIndex = maxRssis.firstIndex(of: maxRssiValue) ?? 0
+                let roomNames = ["自室","リビング","浴室"]
+                event.location = roomNames[maxRssiIndex]
+                print(event.location)
+            } else {
+                event.location = "自宅外"
+                // GPSから場所名を取得する処理
+            }
+            
+            apiClient.createEvent(event: event)
+            
+            // beaconの値初期化
+            self.beaconMaxRssi1 = -1000
+            self.beaconMaxRssi2 = -1000
+            self.beaconMaxRssi3 = -1000
+        }
     }
 }
