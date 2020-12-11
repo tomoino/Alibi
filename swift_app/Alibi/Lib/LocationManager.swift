@@ -194,7 +194,7 @@ extension LocationManager: CLLocationManagerDelegate {
             var event = Event(id: 1,
                      time: "",
                      location: "",
-                     event: "GPSのテスト",
+                     event: "Beaconのテスト",
                      created_at: "",
                      updated_at: "",
                      longitude: self.lastLocation?.coordinate.longitude ?? 0,
