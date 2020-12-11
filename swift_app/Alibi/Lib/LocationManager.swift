@@ -10,12 +10,16 @@ import CoreLocation
 import Combine
 
 class LocationManager: NSObject, ObservableObject {
-
+    
     var beaconRegion : CLBeaconRegion!
     var beacon1: Int
+    var beacon2: Int
+    var beacon3: Int
 
     override init() {
-        self.beacon1 = -100
+        self.beacon1 = 0
+        self.beacon2 = 0
+        self.beacon3 = 0
         super.init()
         self.locationManager.delegate = self
         self.locationManager.allowsBackgroundLocationUpdates = true; // バックグランドモードで使用する場合YESにする必要がある
@@ -24,8 +28,7 @@ class LocationManager: NSObject, ObservableObject {
         self.locationManager.requestWhenInUseAuthorization()
         self.locationManager.startUpdatingLocation()
         
-//        var trackLocationManager : CLLocationManager!
-                // BeaconのUUIDを設定
+        // BeaconのUUIDを設定
         let uuid:UUID? = UUID(uuidString: "FDA50693-A4E2-4FB1-AFCF-C6EB07647825")
 
         //Beacon領域を作成
@@ -123,8 +126,8 @@ extension LocationManager: CLLocationManagerDelegate {
     
     //領域に入った時
     func locationManager(_ manager: CLLocationManager, didEnterRegion region: CLRegion) {
-            // →(didRangeBeacons)で測定をはじめる
-            manager.startRangingBeacons(in: self.beaconRegion)
+        // →(didRangeBeacons)で測定をはじめる
+        manager.startRangingBeacons(in: self.beaconRegion)
     }
 
     //領域から出た時
@@ -138,10 +141,18 @@ extension LocationManager: CLLocationManagerDelegate {
             if(beacons.count > 0){
                 for i in 0 ..< beacons.count {
                     let beacon = beacons[i]
-                    let beaconUUID = beacon.proximityUUID;
                     let rssi = beacon.rssi;
-                    print("UUID:\(beacon.proximityUUID), rssi: \(beacon.rssi)")
-                    self.beacon1 = beacon.rssi
+                    print("minor:\(beacon.minor), rssi: \(beacon.rssi)")
+                    
+                    if beacon.minor == 1000 {
+                        self.beacon1 = beacon.rssi
+                    }
+                    if beacon.minor == 2000 {
+                        self.beacon2 = beacon.rssi
+                    }
+                    if beacon.minor == 3000 {
+                        self.beacon3 = beacon.rssi
+                    }
                 }
             }
     }
@@ -150,7 +161,7 @@ extension LocationManager: CLLocationManagerDelegate {
         guard let location = locations.last else { return }
         self.lastLocation = location
         print(#function, location)
-        print("Location: \(self.beacon1)")
+        print("Location: (\(self.beacon1),\(self.beacon2),\(self.beacon3))")
         
         let date = Date()
         let calendar = Calendar.current
@@ -170,8 +181,8 @@ extension LocationManager: CLLocationManagerDelegate {
                  )
         
 //        if (minute % 10 == 0 && second == 0) {
-          if (minute % 30 == 0 && second == 0 && hour > 7 && hour < 21) { // 一時的に時間制限をつけてデータを集める
-            apiClient.createEvent(event: event)
-        }
+//          if (minute % 30 == 0 && second == 0 && hour > 7 && hour < 21) { // 一時的に時間制限をつけてデータを集める
+//            apiClient.createEvent(event: event)
+//        }
     }
 }

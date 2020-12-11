@@ -28,6 +28,9 @@ struct ContentView: View {
             Text("latitude: \(userLatitude)")
             Text("longitude: \(userLongitude)")
         }
+        HStack {
+            Text("beacon: (\(locationManager.beacon1),\(locationManager.beacon2),\(locationManager.beacon3))")
+        }
         NavigationView {
             // 通信クラスの eventData プロパティを設定
             List(apiClient.eventData) { event in
