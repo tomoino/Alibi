@@ -189,7 +189,7 @@ extension LocationManager: CLLocationManagerDelegate {
         let minute = calendar.component(.minute, from: date)
         let second = calendar.component(.second, from: date)
         
-        if (minute % 10 == 0 && second == 0 && hour > 11 && hour < 23) { // 10分間隔で実行 // 一時的に12〜22.5時まで
+        if (minute % 10 == 0 && second == 0) { // 10分間隔で実行
             let apiClient = ApiClient()
             var event = Event(id: 1,
                      time: "",
