@@ -15,10 +15,11 @@ const builder = kuromoji.builder({
     dicPath: chrome.extension.getURL("resources/dict")
 })
   
+var tf: { [word: string]: number } = {};
+
 builder.build((err, tokenizer) => {
     if (err) return;
 
-    var tf: { [word: string]: number } = {};
     var word_num = 0;
     var tokens = tokenizer.tokenize(res);
     // console.dir(tokens);
@@ -34,15 +35,13 @@ builder.build((err, tokenizer) => {
             }
         }
     }
-    for (var id in tf) {
-        tf[id] = tf[id] / word_num;
+    for (var word in tf) {
+        tf[word] = tf[word] / word_num;
     }
-    console.log(tf)
+    // console.log(tf)
 })
 
 var idf_URL = chrome.extension.getURL("resources/words_idf.json")
-// var json = require(idf_URL)
-console.log(idf_URL)
 
 const axios = require('axios')
 
@@ -57,6 +56,19 @@ axios.get(idf_URL)
         console.log(error)
         })
     .then(function () {
-        console.log(idf["コミュニティ"])
-        console.log ("*** 終了 ***")
+        var tfidf = [];
+
+        for (var word in tf) {
+            const word_idf = idf[word] || 0;
+            tfidf.push({key: word, value: tf[word] * word_idf})
+        }
+
+        tfidf.sort(function(a,b){
+            if(a.value < b.value) return 1;
+            if(a.value > b.value) return -1;
+            return 0;
+        });
+        console.log("tf-idf list")
+        console.log(tfidf)
+        console.log ("Keyword: "+tfidf[0].key)
     })
