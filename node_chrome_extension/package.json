@@ -59,5 +59,10 @@
     "webpack": "4.x.x",
     "webpack-stream": "5.x.x",
     "yargs": "15.x.x"
+  },
+  "dependencies": {
+    "@types/kuromoji": "^0.1.0",
+    "kuromoji": "^0.1.2",
+    "mecab-async": "^0.1.2"
   }
 }
