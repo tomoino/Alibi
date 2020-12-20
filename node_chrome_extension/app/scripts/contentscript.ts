@@ -39,3 +39,24 @@ builder.build((err, tokenizer) => {
     }
     console.log(tf)
 })
+
+var idf_URL = chrome.extension.getURL("resources/words_idf.json")
+// var json = require(idf_URL)
+console.log(idf_URL)
+
+const axios = require('axios')
+
+var idf: { [word: string]: number } = {};
+
+axios.get(idf_URL)
+    .then(function (response: any) {
+        idf = response.data;      
+    })
+    .catch(function (error:any) {
+        console.log("*** error ***")
+        console.log(error)
+        })
+    .then(function () {
+        console.log(idf["コミュニティ"])
+        console.log ("*** 終了 ***")
+    })
