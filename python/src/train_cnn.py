@@ -40,7 +40,7 @@ def load_word_vec(filepath):
 
     return np.array(embedding_matrix), word_index
 
-def load_data(filepath, word_index, max_length=3000):
+def load_data(filepath, word_index, max_length=5000):
     data = []
     category_dict = {"プロ研": 0, "回路理論": 1, "多変量解析": 2, "ビジネス":3, "電生実験": 4, "OS": 5, "論文読み": 6, "開発環境構築": 7, "語学": 8}
 
@@ -79,7 +79,7 @@ def load_data(filepath, word_index, max_length=3000):
     
     return data
 
-def train(inputs, targets, embedding_matrix, batch_size=1024, epoch_count=100, max_length=3000, model_filepath="../model/cnn_model.h5", learning_rate=0.001):
+def train(inputs, targets, embedding_matrix, batch_size=1024, epoch_count=100, max_length=5000, model_filepath="../model/cnn_model.h5", learning_rate=0.001):
     # train:validation:test = 6:2:2
     test_len = int(len(inputs) * 0.2)
     test_inputs = inputs[0:test_len]
@@ -111,10 +111,10 @@ def train(inputs, targets, embedding_matrix, batch_size=1024, epoch_count=100, m
     #Embedding層は学習しないようする
     model.layers[0].trainable = False
 
-    model.compile(loss='categorical_crossentropy',
-              optimizer=keras.optimizers.Adam(1e-4),
-              metrics=['accuracy'])
-    # model.compile(optimizer='rmsprop', loss='categorical_crossentropy', metrics=['accuracy'])
+    # model.compile(loss='categorical_crossentropy',
+    #           optimizer=keras.optimizers.Adam(1e-4),
+    #           metrics=['accuracy'])
+    model.compile(optimizer='rmsprop', loss='categorical_crossentropy', metrics=['accuracy'])
 
 
     # 学習
