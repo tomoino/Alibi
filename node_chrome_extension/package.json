@@ -61,6 +61,7 @@
     "yargs": "15.x.x"
   },
   "dependencies": {
+    "@tensorflow/tfjs": "^2.7.0",
     "@types/kuromoji": "^0.1.0",
     "axios": "^0.21.0",
     "kuromoji": "^0.1.2",

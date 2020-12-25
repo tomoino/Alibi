@@ -3,3 +3,5 @@ __pycache__
 python/data
 python/model
 python/result
+node_chrome_extension/dist
+node_chrome_extension/resources
