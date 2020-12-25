@@ -513,6 +513,42 @@ optional = false
 python-versions = "*"
 
 [[package]]
+name = "tensorflow-hub"
+version = "0.9.0"
+description = "TensorFlow Hub is a library to foster the publication, discovery, and consumption of reusable parts of machine learning models."
+category = "main"
+optional = false
+python-versions = "*"
+
+[package.dependencies]
+numpy = ">=1.12.0"
+protobuf = ">=3.8.0"
+six = ">=1.12.0"
+
+[package.extras]
+make_image_classifier = ["keras-preprocessing"]
+make_nearest_neighbour_index = ["apache-beam", "annoy"]
+
+[[package]]
+name = "tensorflowjs"
+version = "2.8.1"
+description = "Python Libraries and Tools for TensorFlow.js"
+category = "main"
+optional = false
+python-versions = "*"
+
+[package.dependencies]
+h5py = ">=2.8.0,<3"
+six = ">=1.12.0,<2"
+tensorflow = ">=2.1.0,<3"
+tensorflow-hub = ">=0.7.0,<0.10"
+
+[package.extras]
+pyinquirer = ["PyInquirer (==1.0.3)"]
+all = ["PyInquirer (==1.0.3)"]
+wizard = ["PyInquirer (==1.0.3)"]
+
+[[package]]
 name = "termcolor"
 version = "1.1.0"
 description = "ANSII Color formatting for output in terminal."
@@ -564,7 +600,7 @@ python-versions = "*"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "ee3e922b93d9069d063858e27bcf55e51480911fd16c67215493cadce843ed35"
+content-hash = "83ff019507c8f5cc64aab171cfe2b1268eca4c098fabde5c4f8151d317cd7eb8"
 
 [metadata.files]
 absl-py = [
@@ -1024,6 +1060,13 @@ tensorflow = [
 ]
 tensorflow-estimator = [
     {file = "tensorflow_estimator-2.4.0-py2.py3-none-any.whl", hash = "sha256:5b7b7bf2debe19a8794adacc43e8ba6459daa4efaf54d3302623994a359b17f0"},
+]
+tensorflow-hub = [
+    {file = "tensorflow_hub-0.9.0-py2.py3-none-any.whl", hash = "sha256:9f8820291397a17c67a93266ba8d5f53fce71339f10344eeb4fc484307137c88"},
+]
+tensorflowjs = [
+    {file = "tensorflowjs-2.8.1-py2-none-any.whl", hash = "sha256:3de64dc01e2477212116d1ee074e18406b825618077cc7ceb3723b4b7a3743ed"},
+    {file = "tensorflowjs-2.8.1-py3-none-any.whl", hash = "sha256:a5f2de43d2c52f9d97f7e420c6c895ce81de247d20ad98a5afce95a2e0c66d2b"},
 ]
 termcolor = [
     {file = "termcolor-1.1.0.tar.gz", hash = "sha256:1d6d69ce66211143803fbc56652b41d73b4a400a2891d7bf7a1cdf4c02de613b"},
