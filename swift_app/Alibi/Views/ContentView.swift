@@ -31,15 +31,38 @@ struct ContentView: View {
         HStack {
             Text("rssi: (\(locationManager.beaconRssi1),\(locationManager.beaconRssi2),\(locationManager.beaconRssi3)), max rssi: (\(locationManager.beaconMaxRssi1),\(locationManager.beaconMaxRssi2),\(locationManager.beaconMaxRssi3))")
         }
-        NavigationView {
-            // 通信クラスの eventData プロパティを設定
-            List(apiClient.eventData) { event in
-                NavigationLink(destination: EventDetailView(eventData: event)) {
-                    EventRowView(eventData: event)
+//        NavigationView {
+//            // 通信クラスの eventData プロパティを設定
+//            List(apiClient.eventData) { event in
+//                NavigationLink(destination: EventDetailView(eventData: event)) {
+//                    EventRowView(eventData: event)
+//                }
+//            }
+//            .navigationBarTitle(Text("Timeline"))
+//        }
+        TabView {
+                    HomeView()
+                        .tabItem {
+                            VStack {
+                                Image(systemName: "house.fill")
+                                Text("Home")
+                            }
+                    }.tag(1)
+                    TimelineView()
+                        .tabItem {
+                            VStack {
+                                Image(systemName: "calendar")
+                                Text("Timeline")
+                            }
+                    }.tag(2)
+                    ReportView()
+                        .tabItem {
+                            VStack {
+                                Image(systemName: "chart.pie.fill")
+                                Text("Report")
+                            }
+                    }.tag(3)
                 }
-            }
-            .navigationBarTitle(Text("Timeline"))
-        }
     }
 }
 
