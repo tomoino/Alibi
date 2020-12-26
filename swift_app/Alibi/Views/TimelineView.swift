@@ -9,11 +9,11 @@ import SwiftUI
 
 struct TimelineView: View {
     @State private var page = 0 // 初期値
-    let date = [Int](1...100)
+    let date = [Int](1...31)
     var pages: [DayTimeline] = []
  
     init(){
-        for i in 1 ... 100 {
+        for i in 1 ... 31 {
             pages.append(DayTimeline(day: i))
         }
     }
@@ -31,19 +31,7 @@ struct TimelineView: View {
             }
             
             PageView(pages, currentPage: $page)
-//                HStack {
-//                    Week()
-//                    Week()
-//                    Week()
-//                    Week()
-//                }
-                    Spacer()
-                    List() {
-                        Text("Hoge")
-                        Text("Fuga")
-                    }
-                    Spacer()
-                }
+        }
     }
 }
 
@@ -51,7 +39,20 @@ struct DayTimeline: View {
     var day: Int
     
     var body: some View {
-        Text(String(day))
+        Text("12月\(day)日").font(.title)
+        ScrollView(.vertical) {
+                    VStack(spacing: 10) {
+                        Divider()
+                        ForEach(0..<24) {
+                            Text("\($0):00")
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .padding(EdgeInsets(top: 2, leading: 12, bottom: 10, trailing: 12))
+                            Divider()
+                        }
+                        Spacer(minLength: 50)   // Viewの最下段にスペースを追加
+                    }
+                    .frame(maxWidth: .infinity) // スクロールの対象範囲を画面幅いっぱいにする為
+                }
     }
 }
 
