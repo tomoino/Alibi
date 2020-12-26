@@ -1,67 +1,68 @@
 // Enable chromereload by uncommenting this line:
 // import 'chromereload/devonly'
+console.log("--- ALIBI CHROME EXTENSION ---");
+
 const axios = require('axios')
 import * as tfjs from '@tensorflow/tfjs';
-const MAX_LENGTH = 3000;
+import * as kuromoji from 'kuromoji';
 
+const MAX_LENGTH = 3000;
+const categories = ["プロ研", "回路理論", "多変量解析", "ビジネス", "電生実験", "OS", "論文読み", "開発環境構築", "語学"]
 
 var word_index_URL = chrome.extension.getURL("resources/word_index.json")
 var word_index_json = []
 var word_index: { [word: string]: number } = {};
 
+// CNN predict
 async function predict(word_list: number[]) { 
     const model_path = chrome.extension.getURL("resources/jsmodel/model.json");
     const model = await tfjs.loadLayersModel(model_path);
-
-    // predict
-    // let word_list = []
-
-    // for (var i = 0; i < MAX_LENGTH; i++) {
-    //     word_list.push(1)
-    // }
-
+    
+    console.log("CNN input word list")
     console.log(word_list)
-
+    
     const xs = tfjs.tensor2d(word_list, [1, MAX_LENGTH]);
     const y_pred = await model.predict(xs);
-    console.dir(y_pred)
-    console.log(JSON.stringify(y_pred))
-    // // // y_pred.print();
-    // for (var val in y_pred) {
-    //     console.log(val)
-    // }
-
-    // convert to array
-    // const values = await y_pred.data();
-    // const arr = await Array.from(values);
-    // console.log(arr);
+    
+    console.log("CNN predict result");
+    console.log(categories);
+    (y_pred as tfjs.Tensor<tfjs.Rank>).print();
+    
+    const values = (y_pred as tfjs.Tensor<tfjs.Rank>).data().then(value => {
+        let max_val = -Infinity
+        let index = 0
+        for (let i = 0, l = value.length; i < l; i++) {
+            if (max_val < value[i]) {
+                max_val = value[i]
+                index = i
+            }
+        }
+        console.log("CNN Result: "+categories[index])
+    });
 }
 
-
-console.log(`'Allo 'Allo! Content script`);
-
+// get text
 var textList = document.body.innerText.split('\n')
-
 textList = textList.filter(text => text.replace(" ", "").replace("　", ""))
 var res = textList.join('\n')
-// console.log(res)
 
-import * as kuromoji from 'kuromoji';
-
+// setup kuromoji
 const builder = kuromoji.builder({
     dicPath: chrome.extension.getURL("resources/dict")
 })
 
-// CNN
+// for CNN
 let word_list: number[] = [];
 
-// TFIDF
+// for TFIDF
 var tf: { [word: string]: number } = {};
+var idf: { [word: string]: number } = {};
+const idf_URL = chrome.extension.getURL("resources/words_idf.json")
 
 // word index
 axios.get(word_index_URL)
-    .then(function (response: any) {
-        word_index_json = response.data;
+.then(function (response: any) {
+    word_index_json = response.data;
         for (var id in word_index_json) {
             const elm = word_index_json[id];
             word_index[elm.word] = Number(elm.id);
@@ -88,7 +89,6 @@ axios.get(word_index_URL)
                         word_list.push(0);
                     }
                 }
-                // console.log(tokens[token].basic_form)
                 if (word != "*") {
                     word_num++;
                     if (tf[word]) {
@@ -114,14 +114,6 @@ axios.get(word_index_URL)
 
     })
 
-
-
-// TFIDF
-var idf_URL = chrome.extension.getURL("resources/words_idf.json")
-
-
-var idf: { [word: string]: number } = {};
-
 axios.get(idf_URL)
 .then(function (response: any) {
     idf = response.data;      
@@ -143,7 +135,14 @@ axios.get(idf_URL)
         if(a.value > b.value) return -1;
         return 0;
     });
-    console.log("tf-idf list")
+    console.log("TF-IDF list")
     console.log(tfidf)
-    console.log ("Keyword: "+tfidf[0].key)
+    
+    let top_keywords: string[] = [];
+    for (var i = 0; i < 10; i++) {
+        top_keywords.push(tfidf[i].key)
+    }
+
+    console.log("TF-IDF Result (Top 10):")
+    console.log(top_keywords)
 })
