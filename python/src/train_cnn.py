@@ -1,15 +1,29 @@
 #coding: utf-8
 import numpy as np
-import keras
-from keras.optimizers import *
-from keras.layers import *
-from keras.callbacks import *
-from keras.models import *
+import tensorflow as tf
+import tensorflow.keras as keras
+
+from tensorflow.keras.optimizers import *
+from tensorflow.keras.layers import *
+from tensorflow.keras.callbacks import *
+from tensorflow.keras.models import *
 from numpy import *
 import codecs
 import pandas as pd
 import matplotlib.pyplot as plt
 import csv
+
+gpu_id = 0
+physical_devices = tf.config.list_physical_devices('GPU')
+tf.config.list_physical_devices('GPU')
+tf.config.set_visible_devices(physical_devices[gpu_id], 'GPU')
+tf.config.experimental.set_memory_growth(physical_devices[gpu_id], True)
+
+# parameter
+MAX_LENGTH = 3000;
+EPOCH = 200;
+BATCH_SIZE = 32;
+CATEGORIES = ["プロ研", "回路理論", "多変量解析", "ビジネス", "電生実験", "OS", "論文読み", "開発環境構築", "語学"]
 
 # word2vecからembedding layer用の重み行列を作成。wordとindexを結びつける辞書word_indexも返す。
 # predict用にword_index.csvも生成する
@@ -40,24 +54,13 @@ def load_word_vec(filepath):
 
     return np.array(embedding_matrix), word_index
 
-def load_data(filepath, word_index, max_length=5000):
+def load_data(filepath, word_index, max_length=MAX_LENGTH):
     data = []
-    category_dict = {"プロ研": 0, "回路理論": 1, "多変量解析": 2, "ビジネス":3, "電生実験": 4, "OS": 5, "論文読み": 6, "開発環境構築": 7, "語学": 8}
+    category_dict = {}
 
-    # df = pd.read_csv('../data/documents.csv')
-
-    # for row in df:
-    #     print(row)
-    #     category = [1 if i == category_dict[row[1]] else 0 for i in range(10)] # 正解ラベルだけ1にした配列
-    #     words = [word_index[word] for word in row[0].split(' ') if word in word_index] # 単語埋め込み：word_indexに変換
-
-    #     # 長さをそろえる
-    #     if len(words) > max_length:
-    #         words = words[0:max_length]
-    #     elif len(words) < max_length:
-    #         words = words + [0] * (max_length - len(words))
-               
-    #     data.append((category,words))
+    for category in CATEGORIES:
+        category_dict[category] = CATEGORIES.index(category)
+    # category_dict = {"プロ研": 0, "回路理論": 1, "多変量解析": 2, "ビジネス":3, "電生実験": 4, "OS": 5, "論文読み": 6, "開発環境構築": 7, "語学": 8}
 
     with open(filepath,'r',encoding="utf-8") as f:
         for l in f:
@@ -79,7 +82,7 @@ def load_data(filepath, word_index, max_length=5000):
     
     return data
 
-def train(inputs, targets, embedding_matrix, batch_size=1024, epoch_count=100, max_length=5000, model_filepath="../model/cnn_model.h5", learning_rate=0.001):
+def train(inputs, targets, embedding_matrix, batch_size=BATCH_SIZE, epoch_count=100, max_length=MAX_LENGTH, model_filepath="../model/cnn_model.h5", learning_rate=0.001):
     # train:validation:test = 6:2:2
     test_len = int(len(inputs) * 0.2)
     test_inputs = inputs[0:test_len]
@@ -111,10 +114,10 @@ def train(inputs, targets, embedding_matrix, batch_size=1024, epoch_count=100, m
     #Embedding層は学習しないようする
     model.layers[0].trainable = False
 
-    # model.compile(loss='categorical_crossentropy',
-    #           optimizer=keras.optimizers.Adam(1e-4),
-    #           metrics=['accuracy'])
-    model.compile(optimizer='rmsprop', loss='categorical_crossentropy', metrics=['accuracy'])
+    model.compile(loss='categorical_crossentropy',
+              optimizer=keras.optimizers.Adam(1e-4),
+              metrics=['accuracy'])
+    # model.compile(optimizer='rmsprop', loss='categorical_crossentropy', metrics=['accuracy'])
 
 
     # 学習
@@ -147,7 +150,7 @@ if __name__ == "__main__":
     input_values = np.array(input_values)
     target_values = np.array(target_values)
 
-    history = train(input_values, target_values, embedding_matrix, epoch_count=200)
+    history = train(input_values, target_values, embedding_matrix, epoch_count=EPOCH)
     history_df = pd.DataFrame(history.history)
 
     history_df.loc[:,['val_loss','loss']].plot()

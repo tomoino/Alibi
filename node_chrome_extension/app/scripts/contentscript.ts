@@ -1,13 +1,12 @@
-// Enable chromereload by uncommenting this line:
-// import 'chromereload/devonly'
+// parameter
+const MAX_LENGTH = 3000;
+const categories = ["プロ研", "回路理論", "多変量解析", "ビジネス", "電生実験", "OS", "論文読み", "開発環境構築", "語学"]
+
 console.log("--- ALIBI CHROME EXTENSION ---");
 
 const axios = require('axios')
 import * as tfjs from '@tensorflow/tfjs';
 import * as kuromoji from 'kuromoji';
-
-const MAX_LENGTH = 3000;
-const categories = ["プロ研", "回路理論", "多変量解析", "ビジネス", "電生実験", "OS", "論文読み", "開発環境構築", "語学"]
 
 var word_index_URL = chrome.extension.getURL("resources/word_index.json")
 var word_index_json = []
