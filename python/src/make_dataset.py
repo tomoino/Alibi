@@ -17,7 +17,7 @@ def load_url_list(filepath):
 
     return url_list
 
-url_list = load_url_list("../data/history_test.csv")
+url_list = load_url_list("../data/history_UTF.csv")
 
 data = [] # 出力するデータを格納 [[text,category],...]
 lenlist = []
