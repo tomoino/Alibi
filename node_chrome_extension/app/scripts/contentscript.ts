@@ -36,8 +36,31 @@ async function predict(word_list: number[]) {
                 index = i
             }
         }
-        console.log("CNN Result: "+categories[index])
+        console.log("CNN Result: " + categories[index])
+        update_database(categories[index])
     });
+}
+
+async function update_database(pred: String) {
+    axios.get("https://alibi-api.herokuapp.com/event/current/")
+    .then(function (response: any) {
+        const ev = response.data;
+        console.log(ev)
+        if (ev.Event) {
+            ev.Event = ev.Event + "," + pred
+        } else {
+            ev.Event = pred
+        }
+        console.log(ev)
+        axios.post("https://alibi-api.herokuapp.com/update/" + ev.Id, ev)
+        .then(function (response: any) {
+            console.log(response.data);
+        })
+    })
+    .catch(function (error:any) {
+        console.log("*** error ***")
+        console.log(error)
+    })
 }
 
 // get text
