@@ -6,14 +6,7 @@
 //
 
 import SwiftUI
-struct ContentView: View {
-    // ObservableObject に準拠したクラスを監視
-    @ObservedObject var apiClient = ApiClient()
-    
-    init(){
-        apiClient.getAllEvents()
-    }
-    
+struct ContentView: View {    
     var body: some View {
         TabView {
             HomeView()
