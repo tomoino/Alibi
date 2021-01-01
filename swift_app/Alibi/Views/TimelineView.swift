@@ -38,29 +38,35 @@ struct TimelineView: View {
         print("TEST")
         print(apiClient.eventData)
         
-        event_elements.eventElements[12] = [
-            1:[
-                EventElement(event: "プロ研", hour: 0, min: 0, length: 10),
-                EventElement(event: "プロ研", hour: 0, min: 10, length: 10),
-                EventElement(event: "プロ研", hour: 0, min: 20, length: 10),
-                EventElement(event: "プロ研", hour: 0, min: 30, length: 10),
-            ],
-            2:[
-                EventElement(event: "プロ研", hour: 0, min: 40, length: 10),
-                EventElement(event: "プロ研", hour: 0, min: 50, length: 10),
-                EventElement(event: "プロ研aaa", hour: 3, min: 0, length: 60),
-                EventElement(event: "プロ研bbbbb", hour: 5, min: 0, length: 60),
-                EventElement(event: "プロ研bbbbb", hour: 7, min: 0, length: 20),
-                EventElement(event: "プロ研bbbbb", hour: 7, min: 20, length: 20),
-                EventElement(event: "プロ研bbbbb", hour: 7, min: 40, length: 20),
-                EventElement(event: "プロ研bbbbb", hour: 23, min: 0, length: 60),
-            ]
-        ]
+//        event_elements.eventElements[12] = [
+//            1:[
+//                EventElement(event: "プロ研", hour: 0, min: 0, length: 10),
+//                EventElement(event: "プロ研", hour: 0, min: 10, length: 10),
+//                EventElement(event: "プロ研", hour: 0, min: 20, length: 10),
+//                EventElement(event: "プロ研", hour: 0, min: 30, length: 10),
+//            ],
+//            2:[
+//                EventElement(event: "プロ研", hour: 0, min: 40, length: 10),
+//                EventElement(event: "プロ研", hour: 0, min: 50, length: 10),
+//                EventElement(event: "プロ研aaa", hour: 3, min: 0, length: 60),
+//                EventElement(event: "プロ研bbbbb", hour: 5, min: 0, length: 60),
+//                EventElement(event: "プロ研bbbbb", hour: 7, min: 0, length: 20),
+//                EventElement(event: "プロ研bbbbb", hour: 7, min: 20, length: 20),
+//                EventElement(event: "プロ研bbbbb", hour: 7, min: 40, length: 20),
+//                EventElement(event: "プロ研bbbbb", hour: 23, min: 0, length: 60),
+//            ]
+//        ]
         
         
         
         for j in [12, 1] {
             for i in 1 ... 31 {
+                event_elements.eventElements[j]?[i] = [
+                    EventElement(event: "プロ研", hour: 0, min: 40, length: 10),
+                    EventElement(event: "プロ研", hour: 0, min: 50, length: 10),
+                    EventElement(event: "プロ研aaa", hour: 3, min: 0, length: 60),
+                    EventElement(event: "プロ研bbbbb", hour: 5, min: 0, length: 60),
+                ]
                 pages.append(DayTimeline(event_elements: event_elements, month: j, day: i))
                 date.append(i)
             }
