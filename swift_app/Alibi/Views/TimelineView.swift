@@ -7,14 +7,55 @@
 
 import SwiftUI
 
+class EventElement: ObservableObject, Identifiable {
+    @Published var id = UUID()     // ユニークなIDを自動で設定
+    @Published var event: String
+    @Published var hour: Double
+    @Published var min: Double
+    @Published var length: Double
+
+    init (event: String, hour: Double, min: Double, length:Double) {
+        self.event = event
+        self.hour = hour
+        self.min = min
+        self.length = length
+    }
+}
+
+//struct EventElement: Identifiable {
+//    var id = UUID()     // ユニークなIDを自動で設定
+//    var event: String
+//    var hour: Double
+//    var min: Double
+//    var length: Double
+//}
+
+class EventElements: ObservableObject {
+    @Published var eventElements: [EventElement] = [
+        EventElement(event: "プロ研", hour: 0, min: 0, length: 10),
+        EventElement(event: "プロ研", hour: 0, min: 10, length: 10),
+        EventElement(event: "プロ研", hour: 0, min: 20, length: 10),
+        EventElement(event: "プロ研", hour: 0, min: 30, length: 10),
+        EventElement(event: "プロ研", hour: 0, min: 40, length: 10),
+        EventElement(event: "プロ研", hour: 0, min: 50, length: 10),
+        EventElement(event: "プロ研aaa", hour: 3, min: 0, length: 60),
+        EventElement(event: "プロ研bbbbb", hour: 5, min: 0, length: 60),
+        EventElement(event: "プロ研bbbbb", hour: 7, min: 0, length: 20),
+        EventElement(event: "プロ研bbbbb", hour: 7, min: 20, length: 20),
+        EventElement(event: "プロ研bbbbb", hour: 7, min: 40, length: 20),
+        EventElement(event: "プロ研bbbbb", hour: 23, min: 0, length: 60),
+    ]
+}
+
 struct TimelineView: View {
     @State private var page = 0 // 初期値
     let date = [Int](1...31)
     var pages: [DayTimeline] = []
+    @ObservedObject var event_elements = EventElements()
  
-    init(){
+    init(){        
         for i in 1 ... 31 {
-            pages.append(DayTimeline(day: i))
+            pages.append(DayTimeline(event_elements: event_elements, day: i))
         }
     }
     
@@ -37,6 +78,7 @@ struct TimelineView: View {
 }
 
 struct DayTimeline: View {
+    @ObservedObject var event_elements: EventElements
     var day: Int
     
     var body: some View {
@@ -56,51 +98,34 @@ struct DayTimeline: View {
                 }
                 .frame(maxWidth: .infinity) // スクロールの対象範囲を画面幅いっぱいにする為
                 
-                EventCard(event: "プロ研", hour: 0, min: 0, length: 10)
-                EventCard(event: "プロ研", hour: 0, min: 10, length: 10)
-                EventCard(event: "プロ研", hour: 0, min: 20, length: 10)
-                EventCard(event: "プロ研", hour: 0, min: 30, length: 10)
-                EventCard(event: "プロ研", hour: 0, min: 40, length: 10)
-                EventCard(event: "プロ研", hour: 0, min: 50, length: 10)
-//                EventCard(event: "プロ研", hour: 0, min: 50, length: 10)
-                EventCard(event: "プロ研", hour: 2, min: 0, length: 20)
-                EventCard(event: "プロ研", hour: 2, min: 20, length: 20)
-                EventCard(event: "プロ研", hour: 2, min: 40, length: 20)
-//                EventCard(event: "プロ研", hour: 4, min: 0, length: 10)
-//                EventCard(event: "プロ研", hour: 5, min: 0, length: 60)
-//                EventCard(event: "回路理論", hour: 7, min: 0, length: 120)
-//                EventCard(event: "回路理論", hour: 9, min: 0, length: 60)
-//                EventCard(event: "回路理論", hour: 11, min: 0, length: 60)
-//                EventCard(event: "回路理論1", hour: 13, min: 0, length: 60)
-//                EventCard(event: "回路理論2", hour: 15, min: 0, length: 60)
-//                EventCard(event: "回路理論3", hour: 17, min: 0, length: 60)
-//                EventCard(event: "回路理論", hour: 22, min: 0, length: 60)
-            }
+                ZStack {
+                    ForEach(event_elements.eventElements) { event_element in
+                        VStack () {
+                            EventCard(event_element: event_element)
+                            Spacer(minLength: 50)
+                        }
+                    }
+                }
+            } // ZStack
         }
     }
 }
 
 struct EventCard: View {
-    var event: String
-    var hour: Double
-    var min: Double
-    var length: Double
+    @ObservedObject var event_element: EventElement
     
     var body: some View {
-        let _y: CGFloat = -855+CGFloat(68.5 * (hour + min/60.0))
-        let y = _y < 0 ? _y: CGFloat(138 * (hour - 12.0 + min/60.0))
-        let _h = CGFloat(69.5 * length / 60.0 - 8.0)
-//        let h = length < 30 ? CGFloat(12 * length / 10.0) : _h
-        let h = length >= 30 ? _h: (length >= 20 ? 20: 12)
-        let toppad = length >= 30 ? 5: (length >= 20 ? 2.5: 0)
+        let y: CGFloat = CGFloat(68.7 * (event_element.hour + event_element.min/60.0))
+        let _h = CGFloat(69.5 * event_element.length / 60.0 - 8.0)
+        let h = event_element.length >= 30 ? _h: (event_element.length >= 20 ? 20: 12)
+        let toppad = event_element.length >= 30 ? 5: (event_element.length >= 20 ? 2.5: 0)
         
-        HStack(alignment: .center) {
-                Text(event)
-                .font(.system(size: 12, weight: .bold, design: .default))
-                .foregroundColor(.white)
-                .frame(height: h, alignment: .top)
-                    .padding(EdgeInsets(top: CGFloat(toppad), leading: 10, bottom: 0, trailing: 10))
-                
+        HStack(alignment: .top) {
+            Text(event_element.event)
+            .font(.system(size: 12, weight: .bold, design: .default))
+            .foregroundColor(.white)
+            .frame(height: h, alignment: .top)
+            .padding(EdgeInsets(top: CGFloat(toppad), leading: 10, bottom: 0, trailing: 10))
             Spacer()
         }
         .frame(maxWidth: .infinity, alignment: .top)
