@@ -115,11 +115,12 @@ struct DayTimeline: View {
                 
                 ZStack {
 //                    Text("TEST: \(month) \(day)")
-                    Text(event_elements.eventElements[12]?[1]?[0].event ?? "AAA")
-                    ForEach(event_elements.eventElements[month]?[day] ?? []) { event_element in
-                        VStack () {
-                            EventCard(event_element: event_element)
-                            Spacer(minLength: 50)
+                    if ((event_elements.eventElements[month]?[day]) != nil) {
+                        ForEach(event_elements.eventElements[month]?[day] ?? []) { event_element in
+                            VStack () {
+                                EventCard(event_element: event_element)
+                                Spacer(minLength: 50)
+                            }
                         }
                     }
                 }
