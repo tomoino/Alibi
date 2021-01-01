@@ -22,40 +22,42 @@ class EventElement: ObservableObject, Identifiable {
     }
 }
 
-//struct EventElement: Identifiable {
-//    var id = UUID()     // ユニークなIDを自動で設定
-//    var event: String
-//    var hour: Double
-//    var min: Double
-//    var length: Double
-//}
-
 class EventElements: ObservableObject {
-    @Published var eventElements: [EventElement] = [
-        EventElement(event: "プロ研", hour: 0, min: 0, length: 10),
-        EventElement(event: "プロ研", hour: 0, min: 10, length: 10),
-        EventElement(event: "プロ研", hour: 0, min: 20, length: 10),
-        EventElement(event: "プロ研", hour: 0, min: 30, length: 10),
-        EventElement(event: "プロ研", hour: 0, min: 40, length: 10),
-        EventElement(event: "プロ研", hour: 0, min: 50, length: 10),
-        EventElement(event: "プロ研aaa", hour: 3, min: 0, length: 60),
-        EventElement(event: "プロ研bbbbb", hour: 5, min: 0, length: 60),
-        EventElement(event: "プロ研bbbbb", hour: 7, min: 0, length: 20),
-        EventElement(event: "プロ研bbbbb", hour: 7, min: 20, length: 20),
-        EventElement(event: "プロ研bbbbb", hour: 7, min: 40, length: 20),
-        EventElement(event: "プロ研bbbbb", hour: 23, min: 0, length: 60),
-    ]
+    @Published var eventElements: [EventElement] = []
 }
 
 struct TimelineView: View {
     @State private var page = 0 // 初期値
-    let date = [Int](1...31)
+    var date = [Int]()
     var pages: [DayTimeline] = []
     @ObservedObject var event_elements = EventElements()
+    @ObservedObject var apiClient = ApiClient()
  
-    init(){        
-        for i in 1 ... 31 {
-            pages.append(DayTimeline(event_elements: event_elements, day: i))
+    init(){
+        apiClient.getAllEvents()
+        print("TEST")
+        print(apiClient.eventData)
+        
+        event_elements.eventElements = [
+            EventElement(event: "プロ研", hour: 0, min: 0, length: 10),
+            EventElement(event: "プロ研", hour: 0, min: 10, length: 10),
+            EventElement(event: "プロ研", hour: 0, min: 20, length: 10),
+            EventElement(event: "プロ研", hour: 0, min: 30, length: 10),
+            EventElement(event: "プロ研", hour: 0, min: 40, length: 10),
+            EventElement(event: "プロ研", hour: 0, min: 50, length: 10),
+            EventElement(event: "プロ研aaa", hour: 3, min: 0, length: 60),
+            EventElement(event: "プロ研bbbbb", hour: 5, min: 0, length: 60),
+            EventElement(event: "プロ研bbbbb", hour: 7, min: 0, length: 20),
+            EventElement(event: "プロ研bbbbb", hour: 7, min: 20, length: 20),
+            EventElement(event: "プロ研bbbbb", hour: 7, min: 40, length: 20),
+            EventElement(event: "プロ研bbbbb", hour: 23, min: 0, length: 60),
+        ]
+        
+        for j in [12, 1] {
+            for i in 1 ... 31 {
+                pages.append(DayTimeline(event_elements: event_elements, month: j, day: i))
+                date.append(i)
+            }
         }
     }
     
@@ -79,10 +81,11 @@ struct TimelineView: View {
 
 struct DayTimeline: View {
     @ObservedObject var event_elements: EventElements
+    var month: Int
     var day: Int
     
     var body: some View {
-        Text("12月\(day)日").font(.title)
+        Text("\(month)月\(day)日").font(.title)
         ScrollView(.vertical) {
             ZStack {
                 // 時間軸
