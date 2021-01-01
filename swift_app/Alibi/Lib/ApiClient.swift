@@ -24,6 +24,26 @@ class ApiClient: ObservableObject {
         task.resume()
     }
     
+    func getDailyEvents(month: Int, day: Int) -> [EventElement] {
+        let event_elements: [EventElement] = [
+            EventElement(event: "プロ研", hour: 0, min: 40, length: 10),
+            EventElement(event: "プロ研", hour: 0, min: 50, length: 10),
+            EventElement(event: "プロ研aaa", hour: 3, min: 0, length: 60),
+            EventElement(event: "プロ研bbbbb", hour: 5, min: 0, length: 60),
+        ]
+//        guard let url = URL(string: baseUrl + "/events") else { return }
+//        var request = URLRequest(url: url)
+//        request.httpMethod = "GET"
+//        let task = URLSession.shared.dataTask(with: request, completionHandler: { (data, response, error) in
+//            if let data = data {
+//                self.eventData = try! JSONDecoder().decode([Event].self, from: data)
+//                print(self.eventData)
+//            }
+//        })
+//        task.resume()
+        return event_elements
+    }
+    
     func updateEvent(event: Event) {
         guard let url = URL(string: baseUrl + "/update/\(event.id)") else { return }
         var request = URLRequest(url: url)
