@@ -7,24 +7,24 @@
 
 import SwiftUI
 
-class EventElement: ObservableObject, Identifiable {
-    @Published var id = UUID()     // ユニークなIDを自動で設定
-    @Published var event: String
-    @Published var hour: Double
-    @Published var min: Double
-    @Published var length: Double
-
-    init (event: String, hour: Double, min: Double, length:Double) {
-        self.event = event
-        self.hour = hour
-        self.min = min
-        self.length = length
-    }
-}
-
-class EventElements: ObservableObject {
-    @Published var eventElements: [EventElement] = []
-}
+//class EventElement: ObservableObject, Identifiable {
+//    @Published var id = UUID()     // ユニークなIDを自動で設定
+//    @Published var event: String
+//    @Published var hour: Double
+//    @Published var min: Double
+//    @Published var length: Double
+//
+//    init (event: String, hour: Double, min: Double, length:Double) {
+//        self.event = event
+//        self.hour = hour
+//        self.min = min
+//        self.length = length
+//    }
+//}
+//
+//class EventElements: ObservableObject {
+//    @Published var eventElements: [EventElement] = []
+//}
 
 struct TimelineView: View {
     @State private var page = 0 // 初期値
@@ -38,20 +38,26 @@ struct TimelineView: View {
         print("TEST")
         print(apiClient.eventData)
         
-        event_elements.eventElements = [
-            EventElement(event: "プロ研", hour: 0, min: 0, length: 10),
-            EventElement(event: "プロ研", hour: 0, min: 10, length: 10),
-            EventElement(event: "プロ研", hour: 0, min: 20, length: 10),
-            EventElement(event: "プロ研", hour: 0, min: 30, length: 10),
-            EventElement(event: "プロ研", hour: 0, min: 40, length: 10),
-            EventElement(event: "プロ研", hour: 0, min: 50, length: 10),
-            EventElement(event: "プロ研aaa", hour: 3, min: 0, length: 60),
-            EventElement(event: "プロ研bbbbb", hour: 5, min: 0, length: 60),
-            EventElement(event: "プロ研bbbbb", hour: 7, min: 0, length: 20),
-            EventElement(event: "プロ研bbbbb", hour: 7, min: 20, length: 20),
-            EventElement(event: "プロ研bbbbb", hour: 7, min: 40, length: 20),
-            EventElement(event: "プロ研bbbbb", hour: 23, min: 0, length: 60),
+        event_elements.eventElements[12] = [
+            1:[
+                EventElement(event: "プロ研", hour: 0, min: 0, length: 10),
+                EventElement(event: "プロ研", hour: 0, min: 10, length: 10),
+                EventElement(event: "プロ研", hour: 0, min: 20, length: 10),
+                EventElement(event: "プロ研", hour: 0, min: 30, length: 10),
+            ],
+            2:[
+                EventElement(event: "プロ研", hour: 0, min: 40, length: 10),
+                EventElement(event: "プロ研", hour: 0, min: 50, length: 10),
+                EventElement(event: "プロ研aaa", hour: 3, min: 0, length: 60),
+                EventElement(event: "プロ研bbbbb", hour: 5, min: 0, length: 60),
+                EventElement(event: "プロ研bbbbb", hour: 7, min: 0, length: 20),
+                EventElement(event: "プロ研bbbbb", hour: 7, min: 20, length: 20),
+                EventElement(event: "プロ研bbbbb", hour: 7, min: 40, length: 20),
+                EventElement(event: "プロ研bbbbb", hour: 23, min: 0, length: 60),
+            ]
         ]
+        
+        
         
         for j in [12, 1] {
             for i in 1 ... 31 {
@@ -102,7 +108,9 @@ struct DayTimeline: View {
                 .frame(maxWidth: .infinity) // スクロールの対象範囲を画面幅いっぱいにする為
                 
                 ZStack {
-                    ForEach(event_elements.eventElements) { event_element in
+//                    Text("TEST: \(month) \(day)")
+                    Text(event_elements.eventElements[12]?[1]?[0].event ?? "AAA")
+                    ForEach(event_elements.eventElements[month]?[day] ?? []) { event_element in
                         VStack () {
                             EventCard(event_element: event_element)
                             Spacer(minLength: 50)

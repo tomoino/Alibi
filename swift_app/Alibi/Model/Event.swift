@@ -58,3 +58,22 @@ let mockEventsData: [Event]
              latitude: 139.4275921422954
              )
 ]
+
+class EventElement: ObservableObject, Identifiable {
+    @Published var id = UUID()     // ユニークなIDを自動で設定
+    @Published var event: String
+    @Published var hour: Double
+    @Published var min: Double
+    @Published var length: Double
+
+    init (event: String, hour: Double, min: Double, length:Double) {
+        self.event = event
+        self.hour = hour
+        self.min = min
+        self.length = length
+    }
+}
+
+class EventElements: ObservableObject {
+    @Published var eventElements: [Int:[Int:[EventElement]]] = [:] // [month][day][id]
+}
