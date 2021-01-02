@@ -7,25 +7,6 @@
 
 import SwiftUI
 
-//class EventElement: ObservableObject, Identifiable {
-//    @Published var id = UUID()     // ユニークなIDを自動で設定
-//    @Published var event: String
-//    @Published var hour: Double
-//    @Published var min: Double
-//    @Published var length: Double
-//
-//    init (event: String, hour: Double, min: Double, length:Double) {
-//        self.event = event
-//        self.hour = hour
-//        self.min = min
-//        self.length = length
-//    }
-//}
-//
-//class EventElements: ObservableObject {
-//    @Published var eventElements: [EventElement] = []
-//}
-
 struct TimelineView: View {
     @State private var page = 0 // 初期値
     var date = [Int]()
@@ -100,21 +81,12 @@ struct DayTimeline: View {
                 .frame(maxWidth: .infinity) // スクロールの対象範囲を画面幅いっぱいにする為
                 
                 ZStack {
-//                    if ((apiClient.event_elements.eventElements[year]?[month]?[day]) != nil) {
-//                        ForEach(apiClient.event_elements.eventElements[year]?[month]?[day] ?? []) { event_element in
-//                            VStack () {
-//                                EventCard(event_element: event_element)
-//                                Spacer(minLength: 50)
-//                            }
-//                        }
-//                    }
-                        ForEach(apiClient.daily_events) { event_element in
-                            VStack () {
-                                EventCard(event_element: event_element)
-                                Spacer(minLength: 50)
-                            }
+                    ForEach(apiClient.daily_events) { event_element in
+                        VStack () {
+                            EventCard(event_element: event_element)
+                            Spacer(minLength: 50)
                         }
-                    
+                    }
                 }
             } // ZStack
         }

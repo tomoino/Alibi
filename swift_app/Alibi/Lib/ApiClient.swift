@@ -37,16 +37,9 @@ class ApiClient: ObservableObject {
         let task = URLSession.shared.dataTask(with: request, completionHandler: { (data, response, error) in
             if let data = data {
                 _events = try! JSONDecoder().decode([Event].self, from: data)
-//                print("\(year)-\(month)-\(day)")
-//                print(_events)
                 var flag = 0 // eventの連続フラグ
                 
                 for event in _events {
-                    
-                    if month == 12 && day == 11 {
-                        print(event)
-                    }
-                    
                     if event.event.isEmpty {
                         // 推測処理
                         
