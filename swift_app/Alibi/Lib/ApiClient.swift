@@ -28,16 +28,8 @@ class ApiClient: ObservableObject {
     
     func getDailyEvents(year: Int, month: Int, day: Int) {
         var _events = [Event]()
-        
-//        self.event_elements.eventElements[year]?[month]?[day] = [
-//            EventElement(event: "プロ研", hour: 0, min: 40, length: 10),
-//            EventElement(event: "プロ研", hour: 0, min: 50, length: 10),
-//            EventElement(event: "プロ研aaa", hour: 3, min: 0, length: 60),
-//        ]
-        self.daily_events = [
-//            EventElement(event: "プロ研", hour: 0, min: 00, length: 60),
-//            EventElement(event: "プロ研", hour: 3, min: 00, length: 60),
-        ]
+        self.daily_events = []
+        var event_elements = [EventElement]()
         
         guard let url = URL(string: baseUrl + "/events?from=\(year)-\(month)-\(day)_00:00:00&to=\(year)-\(month)-\(day)_23:59:59") else { return }
         var request = URLRequest(url: url)
@@ -45,9 +37,23 @@ class ApiClient: ObservableObject {
         let task = URLSession.shared.dataTask(with: request, completionHandler: { (data, response, error) in
             if let data = data {
                 _events = try! JSONDecoder().decode([Event].self, from: data)
-                print("\(year)-\(month)-\(day)")
+//                print("\(year)-\(month)-\(day)")
 //                print(_events)
+                var flag = 0 // eventの連続フラグ
+                
                 for event in _events {
+                    
+                    if month == 12 && day == 11 {
+                        print(event)
+                    }
+                    
+                    if event.event.isEmpty {
+                        // 推測処理
+                        
+                        // 推測してもなおemptyなら
+                        flag = 0
+                    }
+                    
                     if !event.event.isEmpty {
                         let event_categories = event.event.components(separatedBy: ",")
                         var category_counts: [String: Int] = [:]
@@ -67,8 +73,30 @@ class ApiClient: ObservableObject {
                         
                         let t1 = event.time.components(separatedBy: "T")
                         let t2 = t1[1].components(separatedBy: ":")
-                        self.daily_events.append(EventElement(event: event_name, hour: Double(t2[0]) ?? 0, min: Double(t2[1]) ?? 0, length: 10))
-                        print(event)
+                        let hour = Double(t2[0])!
+                        let min = Double(t2[1])!
+                        
+                        // 配列にすでに要素がある場合
+                        if event_elements.count > 0 {
+                            let last_index = event_elements.count - 1
+                            let last_event_element = event_elements[last_index]
+                            
+                            // 連続していたら
+                            if (last_event_element.event == event_name && flag == 1){
+                                event_elements[last_index].length += 10
+                            } else {
+                                event_elements.append(EventElement(event: event_name, hour: hour, min: min, length: 10))
+                            }
+                        } else {
+                            event_elements.append(EventElement(event: event_name, hour: hour, min: min, length: 10))
+                        }
+                        
+                        // eventがあったため連続フラグを立てる
+                        flag = 1
+                    }
+                    
+                    for event_element in event_elements {
+                        self.daily_events.append(event_element)
                     }
                 }
             }
