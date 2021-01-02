@@ -49,7 +49,9 @@ class ApiClient: ObservableObject {
 //                print(_events)
                 for event in _events {
                     if !event.event.isEmpty {
-                        self.daily_events.append(EventElement(event: event.event, hour: 5, min: 0, length: 60))
+                        let t1 = event.time.components(separatedBy: "T")
+                        let t2 = t1[1].components(separatedBy: ":")
+                        self.daily_events.append(EventElement(event: event.event, hour: Double(t2[0]) ?? 0, min: Double(t2[1]) ?? 0, length: 10))
                         print(event)
                     }
                 }
