@@ -35,8 +35,8 @@ class ApiClient: ObservableObject {
 //            EventElement(event: "プロ研aaa", hour: 3, min: 0, length: 60),
 //        ]
         self.daily_events = [
-            EventElement(event: "プロ研", hour: 0, min: 00, length: 60),
-            EventElement(event: "プロ研", hour: 3, min: 00, length: 60),
+//            EventElement(event: "プロ研", hour: 0, min: 00, length: 60),
+//            EventElement(event: "プロ研", hour: 3, min: 00, length: 60),
         ]
         
         guard let url = URL(string: baseUrl + "/events?from=\(year)-\(month)-\(day)_00:00:00&to=\(year)-\(month)-\(day)_23:59:59") else { return }
@@ -48,8 +48,10 @@ class ApiClient: ObservableObject {
                 print("\(year)-\(month)-\(day)")
 //                print(_events)
                 for event in _events {
-                    self.daily_events.append(EventElement(event: "プロ研bbbbb", hour: 5, min: 0, length: 60))
-                    print(event)
+                    if !event.event.isEmpty {
+                        self.daily_events.append(EventElement(event: event.event, hour: 5, min: 0, length: 60))
+                        print(event)
+                    }
                 }
             }
         })
