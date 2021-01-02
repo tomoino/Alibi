@@ -49,9 +49,25 @@ class ApiClient: ObservableObject {
 //                print(_events)
                 for event in _events {
                     if !event.event.isEmpty {
+                        let event_categories = event.event.components(separatedBy: ",")
+                        var category_counts: [String: Int] = [:]
+                        
+                        for item in event_categories {
+                            category_counts[item] = (category_counts[item] ?? 0) + 1
+                        }
+                        var event_name = ""
+                        var max_counts = 0
+                        
+                        for (key, value) in category_counts {
+                            if value > max_counts {
+                                event_name = key
+                                max_counts = value
+                            }
+                        }
+                        
                         let t1 = event.time.components(separatedBy: "T")
                         let t2 = t1[1].components(separatedBy: ":")
-                        self.daily_events.append(EventElement(event: event.event, hour: Double(t2[0]) ?? 0, min: Double(t2[1]) ?? 0, length: 10))
+                        self.daily_events.append(EventElement(event: event_name, hour: Double(t2[0]) ?? 0, min: Double(t2[1]) ?? 0, length: 10))
                         print(event)
                     }
                 }
