@@ -75,5 +75,5 @@ class EventElement: ObservableObject, Identifiable {
 }
 
 class EventElements: ObservableObject {
-    @Published var eventElements: [Int:[Int:[EventElement]]] = [12:[:],1:[:]] // [month][day][id]
+    @Published var eventElements: [Int:[Int:[Int:[EventElement]]]] = [2020:[12:[:]],2021:[1:[:]]] // [year][month][day][id]
 }

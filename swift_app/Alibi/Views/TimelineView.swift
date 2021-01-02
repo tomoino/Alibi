@@ -34,10 +34,16 @@ struct TimelineView: View {
     @ObservedObject var apiClient = ApiClient()
  
     init(){
+        event_elements = apiClient.getTimelines()
+        
         for j in [12, 1] {
             for i in 1 ... 31 {
-                event_elements.eventElements[j]?[i] = apiClient.getDailyEvents(month: j, day: i)
-                pages.append(DayTimeline(event_elements: event_elements, month: j, day: i))
+                var k = 2020
+                if j == 1 {
+                    k = 2021
+                }
+                
+                pages.append(DayTimeline(event_elements: event_elements, year: k, month: j, day: i))
                 date.append(i)
             }
         }
@@ -63,11 +69,12 @@ struct TimelineView: View {
 
 struct DayTimeline: View {
     @ObservedObject var event_elements: EventElements
+    var year: Int
     var month: Int
     var day: Int
     
     var body: some View {
-        Text("\(month)月\(day)日").font(.title)
+        Text("\(year)年\(month)月\(day)日").font(.title)
         ScrollView(.vertical) {
             ZStack {
                 // 時間軸
@@ -84,9 +91,8 @@ struct DayTimeline: View {
                 .frame(maxWidth: .infinity) // スクロールの対象範囲を画面幅いっぱいにする為
                 
                 ZStack {
-//                    Text("TEST: \(month) \(day)")
-                    if ((event_elements.eventElements[month]?[day]) != nil) {
-                        ForEach(event_elements.eventElements[month]?[day] ?? []) { event_element in
+                    if ((event_elements.eventElements[year]?[month]?[day]) != nil) {
+                        ForEach(event_elements.eventElements[year]?[month]?[day] ?? []) { event_element in
                             VStack () {
                                 EventCard(event_element: event_element)
                                 Spacer(minLength: 50)
