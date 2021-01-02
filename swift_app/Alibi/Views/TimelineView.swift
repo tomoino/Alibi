@@ -34,7 +34,7 @@ struct TimelineView: View {
     @ObservedObject var apiClient = ApiClient()
  
     init(){
-        event_elements = apiClient.getTimelines()
+//        event_elements = apiClient.getTimelines()
         
         for j in [12, 1] {
             for i in 1 ... 31 {
@@ -43,7 +43,7 @@ struct TimelineView: View {
                     k = 2021
                 }
                 
-                pages.append(DayTimeline(event_elements: event_elements, year: k, month: j, day: i))
+                pages.append(DayTimeline(year: k, month: j, day: i))
                 date.append(i)
             }
         }
@@ -68,10 +68,19 @@ struct TimelineView: View {
 }
 
 struct DayTimeline: View {
-    @ObservedObject var event_elements: EventElements
+//    @ObservedObject var event_elements: EventElements
     var year: Int
     var month: Int
     var day: Int
+    @ObservedObject var apiClient = ApiClient()
+    
+    init (year: Int, month: Int, day: Int) {
+        self.year = year
+        self.month = month
+        self.day = day
+        apiClient.getDailyEvents(year: year, month: month, day: day)
+    }
+    
     
     var body: some View {
         Text("\(year)年\(month)月\(day)日").font(.title)
@@ -91,14 +100,21 @@ struct DayTimeline: View {
                 .frame(maxWidth: .infinity) // スクロールの対象範囲を画面幅いっぱいにする為
                 
                 ZStack {
-                    if ((event_elements.eventElements[year]?[month]?[day]) != nil) {
-                        ForEach(event_elements.eventElements[year]?[month]?[day] ?? []) { event_element in
+//                    if ((apiClient.event_elements.eventElements[year]?[month]?[day]) != nil) {
+//                        ForEach(apiClient.event_elements.eventElements[year]?[month]?[day] ?? []) { event_element in
+//                            VStack () {
+//                                EventCard(event_element: event_element)
+//                                Spacer(minLength: 50)
+//                            }
+//                        }
+//                    }
+                        ForEach(apiClient.daily_events) { event_element in
                             VStack () {
                                 EventCard(event_element: event_element)
                                 Spacer(minLength: 50)
                             }
                         }
-                    }
+                    
                 }
             } // ZStack
         }

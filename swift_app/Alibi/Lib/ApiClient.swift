@@ -9,6 +9,8 @@ import Foundation
 
 class ApiClient: ObservableObject {
     @Published var eventData: [Event] = []
+    @Published var event_elements = EventElements()
+    @Published var daily_events = [EventElement]()
     private var baseUrl = "https://alibi-api.herokuapp.com"
     
     func getAllEvents() {
@@ -24,46 +26,34 @@ class ApiClient: ObservableObject {
         task.resume()
     }
     
-    func getDailyEvents(year: Int, month: Int, day: Int) -> [EventElement] {
+    func getDailyEvents(year: Int, month: Int, day: Int) {
         var _events = [Event]()
         
-        let event_elements: [EventElement] = [
-            EventElement(event: "プロ研", hour: 0, min: 40, length: 10),
-            EventElement(event: "プロ研", hour: 0, min: 50, length: 10),
-            EventElement(event: "プロ研aaa", hour: 3, min: 0, length: 60),
-            EventElement(event: "プロ研bbbbb", hour: 5, min: 0, length: 60),
+//        self.event_elements.eventElements[year]?[month]?[day] = [
+//            EventElement(event: "プロ研", hour: 0, min: 40, length: 10),
+//            EventElement(event: "プロ研", hour: 0, min: 50, length: 10),
+//            EventElement(event: "プロ研aaa", hour: 3, min: 0, length: 60),
+//        ]
+        self.daily_events = [
+            EventElement(event: "プロ研", hour: 0, min: 00, length: 60),
+            EventElement(event: "プロ研", hour: 3, min: 00, length: 60),
         ]
         
-        guard let url = URL(string: baseUrl + "/events?from=\(year)-\(month)-\(day)_00:00:00&to=\(year)-\(month)-\(day)_23:59:59") else { return event_elements}
+        guard let url = URL(string: baseUrl + "/events?from=\(year)-\(month)-\(day)_00:00:00&to=\(year)-\(month)-\(day)_23:59:59") else { return }
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
         let task = URLSession.shared.dataTask(with: request, completionHandler: { (data, response, error) in
             if let data = data {
                 _events = try! JSONDecoder().decode([Event].self, from: data)
                 print("\(year)-\(month)-\(day)")
-                print(_events)
+//                print(_events)
+                for event in _events {
+                    self.daily_events.append(EventElement(event: "プロ研bbbbb", hour: 5, min: 0, length: 60))
+                    print(event)
+                }
             }
         })
         task.resume()
-        
-        return event_elements
-    }
-    
-    func getTimelines() -> EventElements {
-        let event_elements = EventElements()
-        
-        for j in [12, 1] {
-            for i in 1 ... 31 {
-                var k = 2020
-                if j == 1 {
-                    k = 2021
-                }
-                
-                event_elements.eventElements[k]?[j]?[i] = self.getDailyEvents(year: k, month: j, day: i)
-            }
-        }
-        
-        return event_elements        
     }
     
     func updateEvent(event: Event) {
