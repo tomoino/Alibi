@@ -47,14 +47,20 @@ class ApiClient: ObservableObject {
                     if event.event.isEmpty {
                         // 推論処理
                         // ルールベース
-                        if (event.location == "浴室") { // 浴室にいるなら入浴と判定
-                            event.event = "入浴"
-                        } else if (event.location == "リビング") { // リビングにいるなら食事と判定
-                            event.event = "食事"
-                            meal_flag = 1
-                        } else if ((event.location == "自室" && meal_flag == 0) || (sleep_flag == 1)) { // 食事前かつ自室にいる　または　睡眠フラグがたっているとき
-                            event.event = "睡眠"
-                            sleep_flag = 1
+                        if (event.longitude < 139.445 && event.latitude > 35.86) { // 自宅
+                            if (event.location == "浴室") { // 浴室にいるなら入浴と判定
+                                event.event = "入浴"
+                            } else if (event.location == "リビング") { // リビングにいるなら食事と判定
+                                event.event = "食事"
+                                meal_flag = 1
+                            } else if ((event.location == "自室" && meal_flag == 0) || (sleep_flag == 1)) { // 食事前かつ自室にいる　または　睡眠フラグがたっているとき
+                                event.event = "睡眠"
+                                sleep_flag = 1
+                            }
+                        } else if (event.longitude > 139.76 && event.latitude < 35.7) {
+                            event.event = "インターン"
+                        } else {
+                            event.event = "外出"
                         }
                         
                         // 推測してもなおemptyなら
