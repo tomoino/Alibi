@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct TimelineView: View {
-    @State private var page = 0 // 初期値
+    @State private var page = 13// 初期値
     var date = [Int]()
     var pages: [DayTimeline] = []
     @ObservedObject var event_elements = EventElements()
@@ -53,12 +53,15 @@ struct DayTimeline: View {
     var year: Int
     var month: Int
     var day: Int
+//    var d: String // 曜日
+    
     @ObservedObject var apiClient = ApiClient()
     
     init (year: Int, month: Int, day: Int) {
         self.year = year
         self.month = month
         self.day = day
+        
         apiClient.getDailyEvents(year: year, month: month, day: day)
     }
     
@@ -121,7 +124,11 @@ struct CardModifier: ViewModifier {
     func body(content: Content) -> some View {
         content
             .cornerRadius(5)
-            .shadow(color: Color.black.opacity(0.2), radius: 20, x: 0, y: 0)
+            .overlay(
+                RoundedRectangle(cornerRadius: 5)
+                    .stroke(Color.white, lineWidth: 0.3)
+            )
+//            .shadow(color: Color.black.opacity(0.2), radius: 20, x: 0, y: 0)
     }
 }
 

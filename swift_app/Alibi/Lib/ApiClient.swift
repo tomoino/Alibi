@@ -38,16 +38,40 @@ class ApiClient: ObservableObject {
             if let data = data {
                 _events = try! JSONDecoder().decode([Event].self, from: data)
                 var flag = 0 // eventの連続フラグ
+                var meal_flag = 0 // 食事フラグ
+                var sleep_flag = 0 // 睡眠フラグ
                 
-                for event in _events {
+                for _event in _events {
+                    var event = _event
+                    
                     if event.event.isEmpty {
-                        // 推測処理
+                        // 推論処理
+                        // ルールベース
+                        if (event.location == "浴室") { // 浴室にいるなら入浴と判定
+                            event.event = "入浴"
+                        } else if (event.location == "リビング") { // リビングにいるなら食事と判定
+                            event.event = "食事"
+                            meal_flag = 1
+                        } else if ((event.location == "自室" && meal_flag == 0) || (sleep_flag == 1)) { // 食事前かつ自室にいる　または　睡眠フラグがたっているとき
+                            event.event = "睡眠"
+                            sleep_flag = 1
+                        }
                         
                         // 推測してもなおemptyなら
-                        flag = 0
+                        if event.event.isEmpty {
+                            flag = 0
+                        }
                     }
                     
                     if !event.event.isEmpty {
+                        if (sleep_flag == 1 && event.event != "睡眠") { // 睡眠中に別のeventが挟まった場合
+                            sleep_flag = 0
+                            
+                            if (meal_flag == 0) { // 食事前の場合
+                                event_elements.removeLast() // 直前の睡眠eventを削除
+                            }
+                        }
+                        
                         let event_categories = event.event.components(separatedBy: ",")
                         var category_counts: [String: Int] = [:]
                         
@@ -86,11 +110,11 @@ class ApiClient: ObservableObject {
                         
                         // eventがあったため連続フラグを立てる
                         flag = 1
-                    }
-                    
-                    for event_element in event_elements {
-                        self.daily_events.append(event_element)
-                    }
+                    } // event is not empty
+                }
+                
+                for event_element in event_elements {
+                    self.daily_events.append(event_element)
                 }
             }
         })
