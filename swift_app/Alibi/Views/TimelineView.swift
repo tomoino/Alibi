@@ -7,55 +7,26 @@
 
 import SwiftUI
 
-class EventElement: ObservableObject, Identifiable {
-    @Published var id = UUID()     // ユニークなIDを自動で設定
-    @Published var event: String
-    @Published var hour: Double
-    @Published var min: Double
-    @Published var length: Double
-
-    init (event: String, hour: Double, min: Double, length:Double) {
-        self.event = event
-        self.hour = hour
-        self.min = min
-        self.length = length
-    }
-}
-
-//struct EventElement: Identifiable {
-//    var id = UUID()     // ユニークなIDを自動で設定
-//    var event: String
-//    var hour: Double
-//    var min: Double
-//    var length: Double
-//}
-
-class EventElements: ObservableObject {
-    @Published var eventElements: [EventElement] = [
-        EventElement(event: "プロ研", hour: 0, min: 0, length: 10),
-        EventElement(event: "プロ研", hour: 0, min: 10, length: 10),
-        EventElement(event: "プロ研", hour: 0, min: 20, length: 10),
-        EventElement(event: "プロ研", hour: 0, min: 30, length: 10),
-        EventElement(event: "プロ研", hour: 0, min: 40, length: 10),
-        EventElement(event: "プロ研", hour: 0, min: 50, length: 10),
-        EventElement(event: "プロ研aaa", hour: 3, min: 0, length: 60),
-        EventElement(event: "プロ研bbbbb", hour: 5, min: 0, length: 60),
-        EventElement(event: "プロ研bbbbb", hour: 7, min: 0, length: 20),
-        EventElement(event: "プロ研bbbbb", hour: 7, min: 20, length: 20),
-        EventElement(event: "プロ研bbbbb", hour: 7, min: 40, length: 20),
-        EventElement(event: "プロ研bbbbb", hour: 23, min: 0, length: 60),
-    ]
-}
-
 struct TimelineView: View {
-    @State private var page = 0 // 初期値
-    let date = [Int](1...31)
+    @State private var page = 13// 初期値
+    var date = [Int]()
     var pages: [DayTimeline] = []
     @ObservedObject var event_elements = EventElements()
+    @ObservedObject var apiClient = ApiClient()
  
-    init(){        
-        for i in 1 ... 31 {
-            pages.append(DayTimeline(event_elements: event_elements, day: i))
+    init(){
+//        event_elements = apiClient.getTimelines()
+        
+        for j in [12, 1] {
+            for i in 1 ... 31 {
+                var k = 2020
+                if j == 1 {
+                    k = 2021
+                }
+                
+                pages.append(DayTimeline(year: k, month: j, day: i))
+                date.append(i)
+            }
         }
     }
     
@@ -78,11 +49,25 @@ struct TimelineView: View {
 }
 
 struct DayTimeline: View {
-    @ObservedObject var event_elements: EventElements
+//    @ObservedObject var event_elements: EventElements
+    var year: Int
+    var month: Int
     var day: Int
+//    var d: String // 曜日
+    
+    @ObservedObject var apiClient = ApiClient()
+    
+    init (year: Int, month: Int, day: Int) {
+        self.year = year
+        self.month = month
+        self.day = day
+        
+        apiClient.getDailyEvents(year: year, month: month, day: day)
+    }
+    
     
     var body: some View {
-        Text("12月\(day)日").font(.title)
+        Text("\(year)年\(month)月\(day)日").font(.title)
         ScrollView(.vertical) {
             ZStack {
                 // 時間軸
@@ -99,7 +84,7 @@ struct DayTimeline: View {
                 .frame(maxWidth: .infinity) // スクロールの対象範囲を画面幅いっぱいにする為
                 
                 ZStack {
-                    ForEach(event_elements.eventElements) { event_element in
+                    ForEach(apiClient.daily_events) { event_element in
                         VStack () {
                             EventCard(event_element: event_element)
                             Spacer(minLength: 50)
@@ -139,7 +124,11 @@ struct CardModifier: ViewModifier {
     func body(content: Content) -> some View {
         content
             .cornerRadius(5)
-            .shadow(color: Color.black.opacity(0.2), radius: 20, x: 0, y: 0)
+            .overlay(
+                RoundedRectangle(cornerRadius: 5)
+                    .stroke(Color.white, lineWidth: 0.3)
+            )
+//            .shadow(color: Color.black.opacity(0.2), radius: 20, x: 0, y: 0)
     }
 }
 
