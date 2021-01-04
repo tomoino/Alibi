@@ -52,7 +52,10 @@ def load_word_index(filepath):
 
 def predict(url, word_index, model):
     # スクレイピング
-    html = requests.get(url).text
+    try:
+        html = requests.get(url).text
+    except:
+        return ""
     soup = BeautifulSoup(html, "html.parser")
 
     for script in soup(["script", "style"]):
@@ -92,6 +95,8 @@ history = load_history(HISTORY_CSV)
 # word indexの読み込み
 word_index = load_word_index("../data/word_index.csv")
 
+record_num = len(res)
+
 for index, record in enumerate(res):
     res[index]['Event'] = ""
     
@@ -118,4 +123,4 @@ for index, record in enumerate(res):
         'https://alibi-api.herokuapp.com/update/'+str(record["Id"]),
         res[index]).json()
     # print(update_response)
-    print(str(record["Id"])+": "+str(record["Time"])+" "+record["Event"])
+    print(str(int(index/record_num*1000)/10.0) + " % " + str(record["Id"])+": "+str(record["Time"])+" "+record["Event"])
