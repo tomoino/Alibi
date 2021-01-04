@@ -37,6 +37,7 @@ class ApiClient: ObservableObject {
         let task = URLSession.shared.dataTask(with: request, completionHandler: { (data, response, error) in
             if let data = data {
                 _events = try! JSONDecoder().decode([Event].self, from: data)
+                
                 var flag = 0 // eventの連続フラグ
                 var meal_flag = 0 // 食事フラグ
                 var sleep_flag = 0 // 睡眠フラグ
@@ -47,7 +48,7 @@ class ApiClient: ObservableObject {
                     if event.event.isEmpty {
                         // 推論処理
                         // ルールベース
-                        if (event.longitude < 139.445 && event.latitude > 35.86) { // 自宅
+                        if (event.longitude < 139.44500 && event.latitude > 35.860000) { // 自宅
                             if (event.location == "浴室") { // 浴室にいるなら入浴と判定
                                 event.event = "入浴"
                             } else if (event.location == "リビング") { // リビングにいるなら食事と判定
@@ -57,7 +58,7 @@ class ApiClient: ObservableObject {
                                 event.event = "睡眠"
                                 sleep_flag = 1
                             }
-                        } else if (event.longitude > 139.76 && event.latitude < 35.7) {
+                        } else if (event.longitude > 139.76000 && event.latitude < 35.700000) {
                             event.event = "インターン"
                         } else {
                             event.event = "外出"
@@ -106,7 +107,7 @@ class ApiClient: ObservableObject {
                             
                             // 連続していたら
                             if (last_event_element.event == event_name && flag == 1){
-                                event_elements[last_index].length += 10
+                                event_elements[last_index].length = hour * 60 + min - (last_event_element.hour * 60 + last_event_element.min) + 10
                             } else {
                                 event_elements.append(EventElement(event: event_name, hour: hour, min: min, length: 10))
                             }
