@@ -104,7 +104,7 @@ class ApiClient: ObservableObject {
                             let last_event_element = event_elements[last_index]
                             
                             // 連続していたら
-                            if (last_event_element.event == event_name){
+                            if (last_event_element.event == event_name && (hour*60+min) - (last_event_element.hour*60+last_event_element.min+last_event_element.length) <= 60){
                                 event_elements[last_index].length = hour * 60 + min - (last_event_element.hour * 60 + last_event_element.min) + 10
                             } else {
                                 event_elements.append(EventElement(event: event_name, hour: hour, min: min, length: 10))
