@@ -45,6 +45,12 @@ class ApiClient: ObservableObject {
                 for _event in _events {
                     var event = _event
                     
+                    // 時間情報
+                    let t1 = event.time.components(separatedBy: "T")
+                    let t2 = t1[1].components(separatedBy: ":")
+                    let hour = Double(t2[0])!
+                    let min = Double(t2[1])!
+                    
                     if event.event.isEmpty {
                         // 推論処理
                         // ルールベース
@@ -54,7 +60,7 @@ class ApiClient: ObservableObject {
                             } else if (event.location == "リビング") { // リビングにいるなら食事と判定
                                 event.event = "食事"
                                 meal_flag = 1
-                            } else if ((event.location == "自室" && meal_flag == 0) || (sleep_flag == 1)) { // 食事前かつ自室にいる　または　睡眠フラグがたっているとき
+                            } else if ((event.location == "自室" && meal_flag == 0 && hour < 5) || (sleep_flag == 1)) { // 食事前かつ自室にいるかつ5時前　または　睡眠フラグがたっているとき
                                 event.event = "睡眠"
                                 sleep_flag = 1
                             }
@@ -95,10 +101,10 @@ class ApiClient: ObservableObject {
                             }
                         }
                         
-                        let t1 = event.time.components(separatedBy: "T")
-                        let t2 = t1[1].components(separatedBy: ":")
-                        let hour = Double(t2[0])!
-                        let min = Double(t2[1])!
+//                        let t1 = event.time.components(separatedBy: "T")
+//                        let t2 = t1[1].components(separatedBy: ":")
+//                        let hour = Double(t2[0])!
+//                        let min = Double(t2[1])!
                         
                         // 配列にすでに要素がある場合
                         if event_elements.count > 0 {
