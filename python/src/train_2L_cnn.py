@@ -1,4 +1,5 @@
 #coding: utf-8
+# 2層CNNによる実装
 import numpy as np
 import tensorflow as tf
 import tensorflow.keras as keras
