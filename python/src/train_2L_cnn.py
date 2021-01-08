@@ -82,7 +82,8 @@ def load_data(filepath, word_index, max_length=MAX_LENGTH):
             if row[-1] not in CATEGORIES:
                 continue
 
-            category = [1 if i == category_dict[row[-1]] else 0 for i in range(len(category_dict))] # 正解ラベルだけ1にした配列
+            # category = [1 if i == category_dict[row[-1]] else 0 for i in range(len(category_dict))] # 正解ラベルだけ1にした配列
+            category = category_dict[row[-1]] 
             words = [word_index[word] for word in row[0].split(' ') if word in word_index] # 単語埋め込み：word_indexに変換
 
             # 長さをそろえる
@@ -129,13 +130,69 @@ def plot_confusion_matrix(cmx, classes, metrics_dir, normalize=False, title='Con
 
     plt.show()
 
-def train(inputs, targets, embedding_matrix, batch_size=BATCH_SIZE, epoch_count=100, max_length=MAX_LENGTH, model_filepath=f"../model/model_{MODEL_NAME}.h5", learning_rate=0.001):
+def train(data, embedding_matrix, batch_size=BATCH_SIZE, epoch_count=100, max_length=MAX_LENGTH, model_filepath=f"../model/model_{MODEL_NAME}.h5", learning_rate=0.001):
     # train:validation:test = 6:2:2
-    test_len = int(len(inputs) * 0.2)
-    test_inputs = inputs[0:test_len]
-    test_targets = targets[0:test_len]
-    train_inputs = inputs[test_len:]
-    train_targets = targets[test_len:]
+    # test_len = int(len(inputs) * 0.2)
+    # test_inputs = inputs[0:test_len]
+    # test_targets = targets[0:test_len]
+    # train_inputs = inputs[test_len:]
+    # train_targets = targets[test_len:]
+    test_data = []
+    train_data = []
+    validation_data = []
+
+    test_data_rate = 0.2 # testの割合
+    validation_data_rate = 0.2  # validationの割合
+
+    categorized_data = {category_dict[category]: [] for category in CATEGORIES}  # カテゴリごとに分けられたデータ
+    for target_value, input_value in data:
+        categorized_data[target_value].append((target_value, input_value))
+
+    # train, validation, test データのカテゴリ組成を等しくする
+    for category_id in categorized_data:
+        data_len = len(categorized_data[category_id])
+        test_boundary = int(data_len * test_data_rate)
+        validation_boundary = int(data_len * (test_data_rate + validation_data_rate))
+
+        test_data += categorized_data[category_id][0:test_boundary]
+        validation_data += categorized_data[category_id][test_boundary:validation_boundary]
+        train_data += categorized_data[category_id][validation_boundary:]
+    
+    test_inputs = []
+    test_targets = []
+    train_inputs = []
+    train_targets = []
+    validation_inputs = []
+    validation_targets = []
+
+    for target_value, input_value in test_data:
+        test_inputs.append(input_value)
+        test_targets.append([1 if i == target_value else 0 for i in range(len(category_dict))]) # 正解ラベルだけ1にした配列
+
+    for target_value, input_value in validation_data:
+        validation_inputs.append(input_value)
+        validation_targets.append([1 if i == target_value else 0 for i in range(len(category_dict))]) # 正解ラベルだけ1にした配列
+
+    for target_value, input_value in train_data:
+        train_inputs.append(input_value)
+        train_targets.append([1 if i == target_value else 0 for i in range(len(category_dict))]) # 正解ラベルだけ1にした配列
+
+    # カテゴリごとに含まれる数を表示
+    count_by_categories = {key: np.concatenate([np.argmax(test_targets, 1), np.argmax(validation_targets, 1), np.argmax(train_targets, 1)] ).tolist().count(category_dict[key]) for key in CATEGORIES}
+    test_count_by_categories = {key: np.argmax(test_targets, 1).tolist().count(category_dict[key]) for key in CATEGORIES}
+    validation_count_by_categories = {key: np.argmax(validation_targets, 1).tolist().count(category_dict[key]) for key in CATEGORIES}
+    train_count_by_categories = {key: np.argmax(train_targets, 1).tolist().count(category_dict[key]) for key in CATEGORIES}
+    print("ALL: ", count_by_categories)
+    print("TRAIN: ", train_count_by_categories)
+    print("VALIDATION: ", validation_count_by_categories)
+    print("TEST: ", test_count_by_categories)
+
+    test_inputs = np.array(test_inputs)
+    test_targets = np.array(test_targets)
+    train_inputs = np.array(train_inputs)
+    train_targets = np.array(train_targets)
+    validation_inputs = np.array(validation_inputs)
+    validation_targets = np.array(validation_targets)
     
     # 単語数、embeddingの次元
     num_words, word_vec_size = embedding_matrix.shape
@@ -153,7 +210,7 @@ def train(inputs, targets, embedding_matrix, batch_size=BATCH_SIZE, epoch_count=
         GlobalAveragePooling1D(),
         Dense(128, activation='relu'),
         Dropout(0.3),
-        Dense(targets.shape[1], activation='softmax')
+        Dense(len(CATEGORIES), activation='softmax')
     ])
 
     model.summary()
@@ -166,13 +223,13 @@ def train(inputs, targets, embedding_matrix, batch_size=BATCH_SIZE, epoch_count=
     #           metrics=['accuracy'])
     model.compile(optimizer='rmsprop', loss='categorical_crossentropy', metrics=['accuracy'])
 
-
     # 学習
     history = model.fit(train_inputs, train_targets,
               epochs=epoch_count,
               batch_size=batch_size,
               verbose=1,
-              validation_split=0.25,
+              validation_data=(validation_inputs, validation_targets),
+            #   validation_split=0.25,
               shuffle=True)
 
     score = model.evaluate(test_inputs, test_targets, verbose=0)
@@ -194,20 +251,20 @@ if __name__ == "__main__":
 
     docs = load_data("../data/documents.csv", word_index)
 
-    input_values = []
-    target_values = []
-    for target_value, input_value in docs:
-        input_values.append(input_value)
-        target_values.append(target_value)
+    # input_values = []
+    # target_values = []
+    # for target_value, input_value in docs:
+    #     input_values.append(input_value)
+    #     target_values.append(target_value)
 
     # カテゴリごとに含まれる数を表示
-    count_by_categories = {key: np.argmax(target_values, 1).tolist().count(category_dict[key]) for key in CATEGORIES}
-    print(count_by_categories)
+    # count_by_categories = {key: np.argmax(target_values, 1).tolist().count(category_dict[key]) for key in CATEGORIES}
+    # print(count_by_categories)
 
-    input_values = np.array(input_values)
-    target_values = np.array(target_values)
+    # input_values = np.array(input_values)
+    # target_values = np.array(target_values)
 
-    history = train(input_values, target_values, embedding_matrix, epoch_count=EPOCH)
+    history = train(docs, embedding_matrix, epoch_count=EPOCH)
     history_df = pd.DataFrame(history.history)
 
     history_df.loc[:,['val_loss','loss']].plot()
