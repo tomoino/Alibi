@@ -18,6 +18,7 @@ RUN apt-get update && apt-get install -y \
   curl \
   xz-utils \
   file
+RUN apt install fonts-noto-cjk
 
 RUN git clone --depth 1 https://github.com/neologd/mecab-ipadic-neologd.git ; exit 0
 RUN cd mecab-ipadic-neologd && \
@@ -30,6 +31,7 @@ RUN pip install matplotlib
 RUN pip install tensorflowjs
 RUN pip install bs4
 RUN pip install mecab-python3
+RUN pip install sklearn
 
 # duser setting
 ARG USER_ID
