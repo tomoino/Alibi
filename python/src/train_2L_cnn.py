@@ -8,6 +8,7 @@ from tensorflow.keras.optimizers import *
 from tensorflow.keras.layers import *
 from tensorflow.keras.callbacks import *
 from tensorflow.keras.models import *
+from tensorflow.keras.utils import plot_model
 from numpy import *
 import codecs
 import pandas as pd
@@ -33,9 +34,11 @@ tf.config.experimental.set_memory_growth(physical_devices[gpu_id], True)
 # parameter
 MODEL_NAME = "2L_CNN"
 MAX_LENGTH = 3000
-EPOCH = 200
+EPOCH = 1
+# EPOCH = 200
 BATCH_SIZE = 32
-CATEGORIES = ["プロ研", "回路理論", "多変量解析", "ビジネス", "電生実験", "OS", "論文読み", "開発環境構築", "語学"]
+CATEGORIES = ["プロ研", "回路理論", "多変量解析", "ビジネス", "電生実験", "OS", "論文読み", "開発環境構築"]
+# CATEGORIES = ["プロ研", "回路理論", "多変量解析", "ビジネス", "電生実験", "OS", "論文読み", "開発環境構築", "語学"]
 
 category_dict = {}
 # category_dict = {"プロ研": 0, "回路理論": 1, "多変量解析": 2, "ビジネス":3, "電生実験": 4, "OS": 5, "論文読み": 6, "開発環境構築": 7, "語学": 8}
@@ -221,14 +224,25 @@ def train(data, embedding_matrix, batch_size=BATCH_SIZE, epoch_count=100, max_le
     #           metrics=['accuracy'])
     model.compile(optimizer='rmsprop', loss='categorical_crossentropy', metrics=['accuracy'])
 
+    # checkpointの設定
+    checkpoint = ModelCheckpoint(
+        filepath=model_filepath,
+        monitor='val_loss',
+        save_best_only=True,
+        period=1,
+    )
+
     # 学習
     history = model.fit(train_inputs, train_targets,
               epochs=epoch_count,
               batch_size=batch_size,
               verbose=1,
               validation_data=(validation_inputs, validation_targets),
-            #   validation_split=0.25,
+              callbacks=[checkpoint],
               shuffle=True)
+
+    # 最良の結果を残したモデルを読み込む
+    model = load_model(model_filepath)
 
     score = model.evaluate(test_inputs, test_targets, verbose=0)
     print('Test on '+str(len(test_inputs))+' examples')
@@ -240,11 +254,8 @@ def train(data, embedding_matrix, batch_size=BATCH_SIZE, epoch_count=100, max_le
     cmx = confusion_matrix(true_classes, predict_classes)
     plot_confusion_matrix(cmx=cmx, classes=CATEGORIES, metrics_dir=f"../result/{MODEL_NAME}", normalize=False, title='Confusion matrix', cmap=plt.cm.Blues)
 
-    # モデルの保存
-    model.save(model_filepath)
-
     # モデルを可視化した画像の保存
-    visualize_model(model, f"../result/{MODEL_NAME}/model.png"):
+    visualize_model(model, f"../result/{MODEL_NAME}/model.png")
 
     return history
 
