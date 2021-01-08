@@ -69,7 +69,7 @@ def load_data(filepath, word_index, max_length=MAX_LENGTH):
             # CATEGORIESにないカテゴリの行は無視する
             if row[-1] not in CATEGORIES:
                 continue
-            
+
             category = [1 if i == category_dict[row[-1]] else 0 for i in range(len(category_dict))] # 正解ラベルだけ1にした配列
             words = [word_index[word] for word in row[0].split(' ') if word in word_index] # 単語埋め込み：word_indexに変換
 
@@ -121,10 +121,10 @@ def train(inputs, targets, embedding_matrix, batch_size=BATCH_SIZE, epoch_count=
     #Embedding層は学習しないようする
     model.layers[0].trainable = False
 
-    model.compile(loss='categorical_crossentropy',
-              optimizer=keras.optimizers.Adam(1e-4),
-              metrics=['accuracy'])
-    # model.compile(optimizer='rmsprop', loss='categorical_crossentropy', metrics=['accuracy'])
+    # model.compile(loss='categorical_crossentropy',
+    #           optimizer=keras.optimizers.Adam(1e-4),
+    #           metrics=['accuracy'])
+    model.compile(optimizer='rmsprop', loss='categorical_crossentropy', metrics=['accuracy'])
 
 
     # 学習

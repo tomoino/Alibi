@@ -118,10 +118,10 @@ def train(inputs, targets, embedding_matrix, batch_size=BATCH_SIZE, epoch_count=
     #Embedding層は学習しないようする
     model.layers[0].trainable = False
 
-    model.compile(loss='categorical_crossentropy',
-              optimizer=keras.optimizers.Adam(1e-4),
-              metrics=['accuracy'])
-    # model.compile(optimizer='rmsprop', loss='categorical_crossentropy', metrics=['accuracy'])
+    # model.compile(loss='categorical_crossentropy',
+    #           optimizer=keras.optimizers.Adam(1e-4),
+    #           metrics=['accuracy'])
+    model.compile(optimizer='rmsprop', loss='categorical_crossentropy', metrics=['accuracy'])
 
 
     # 学習
