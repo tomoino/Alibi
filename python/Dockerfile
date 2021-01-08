@@ -17,7 +17,9 @@ RUN apt-get update && apt-get install -y \
   make \
   curl \
   xz-utils \
-  file
+  file \
+  graphviz
+
 RUN apt install fonts-noto-cjk
 
 RUN git clone --depth 1 https://github.com/neologd/mecab-ipadic-neologd.git ; exit 0
@@ -32,6 +34,8 @@ RUN pip install tensorflowjs
 RUN pip install bs4
 RUN pip install mecab-python3
 RUN pip install sklearn
+RUN pip install graphviz
+RUN pip install pydotplus
 
 # duser setting
 ARG USER_ID
