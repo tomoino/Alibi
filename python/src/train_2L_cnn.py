@@ -14,6 +14,16 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import csv
 
+from sklearn.metrics import confusion_matrix
+import itertools
+
+from matplotlib import rcParams
+import matplotlib
+
+# matplotlib 日本語対応
+rcParams['font.family'] = ['Noto Sans CJK JP']
+matplotlib.font_manager._rebuild()
+
 gpu_id = 0
 physical_devices = tf.config.list_physical_devices('GPU')
 tf.config.list_physical_devices('GPU')
@@ -21,9 +31,10 @@ tf.config.set_visible_devices(physical_devices[gpu_id], 'GPU')
 tf.config.experimental.set_memory_growth(physical_devices[gpu_id], True)
 
 # parameter
-MAX_LENGTH = 3000;
-EPOCH = 200;
-BATCH_SIZE = 32;
+MODEL_NAME = "2L_CNN"
+MAX_LENGTH = 3000
+EPOCH = 200
+BATCH_SIZE = 32
 CATEGORIES = ["プロ研", "回路理論", "多変量解析", "ビジネス", "電生実験", "OS", "論文読み", "開発環境構築", "語学"]
 
 category_dict = {}
@@ -87,7 +98,38 @@ def load_data(filepath, word_index, max_length=MAX_LENGTH):
     
     return data
 
-def train(inputs, targets, embedding_matrix, batch_size=BATCH_SIZE, epoch_count=100, max_length=MAX_LENGTH, model_filepath="../model/cnn_model.h5", learning_rate=0.001):
+# confusion matrix の作成
+def plot_confusion_matrix(cmx, classes, metrics_dir, normalize=False, title='Confusion matrix', cmap=plt.cm.Blues):
+    if normalize:
+        cmx = cmx.astype('float') / cmx.sum(axis=1)[:, np.newaxis]
+        print('Normalized confusion matrix\n')
+    else:
+        print('Confusion matrix, without normalization\n')
+
+    plt.figure(figsize=(8.0, 8.0))
+    plt.imshow(cmx, interpolation='nearest', cmap=cmap)
+    plt.title(title)
+    plt.colorbar()
+    tick_marks = np.arange(len(classes))
+    plt.xticks(tick_marks, classes, rotation=45)
+    plt.yticks(tick_marks, classes)
+    plt.ylim(len(classes) - 0.5, -0.5)
+
+    fmt = '.2f' if normalize else 'd'
+    thresh = cmx.max() / 2.
+    for i, j in itertools.product(range(cmx.shape[0]), range(cmx.shape[1])):
+        plt.text(j, i, format(cmx[i, j], fmt), horizontalalignment='center', color='white' if cmx[i, j] > thresh else 'black')
+    
+    plt.tight_layout()
+    plt.ylabel('True lable')
+    plt.xlabel('Predicted label')
+
+    cmx_path = metrics_dir + '/cmx.png'
+    plt.savefig(cmx_path, bbox_inches='tight')
+
+    plt.show()
+
+def train(inputs, targets, embedding_matrix, batch_size=BATCH_SIZE, epoch_count=100, max_length=MAX_LENGTH, model_filepath=f"../model/model_{MODEL_NAME}.h5", learning_rate=0.001):
     # train:validation:test = 6:2:2
     test_len = int(len(inputs) * 0.2)
     test_inputs = inputs[0:test_len]
@@ -138,6 +180,11 @@ def train(inputs, targets, embedding_matrix, batch_size=BATCH_SIZE, epoch_count=
     print('Test loss:', score[0])
     print('Test accuracy:', score[1])
 
+    predict_classes = model.predict_classes(test_inputs)
+    true_classes = np.argmax(test_targets, 1)
+    cmx = confusion_matrix(true_classes, predict_classes)
+    plot_confusion_matrix(cmx=cmx, classes=CATEGORIES, metrics_dir=f"../result/{MODEL_NAME}", normalize=False, title='Confusion matrix', cmap=plt.cm.Blues)
+
     # モデルの保存
     model.save(model_filepath)
     return history
@@ -154,7 +201,7 @@ if __name__ == "__main__":
         target_values.append(target_value)
 
     # カテゴリごとに含まれる数を表示
-    count_by_categories = {key: target_values.count(category_dict[key]) for key in CATEGORIES}
+    count_by_categories = {key: np.argmax(target_values, 1).tolist().count(category_dict[key]) for key in CATEGORIES}
     print(count_by_categories)
 
     input_values = np.array(input_values)
@@ -164,6 +211,6 @@ if __name__ == "__main__":
     history_df = pd.DataFrame(history.history)
 
     history_df.loc[:,['val_loss','loss']].plot()
-    plt.savefig("../result/cnn_loss.png")
+    plt.savefig(f"../result/{MODEL_NAME}/loss.png")
     history_df.loc[:,['val_accuracy','accuracy']].plot()
-    plt.savefig("../result/cnn_accuracy.png")
+    plt.savefig(f"../result/{MODEL_NAME}/accuracy.png")
