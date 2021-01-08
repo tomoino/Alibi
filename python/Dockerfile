@@ -36,6 +36,7 @@ RUN pip install mecab-python3
 RUN pip install sklearn
 RUN pip install graphviz
 RUN pip install pydotplus
+RUN pip install imblearn
 
 # duser setting
 ARG USER_ID

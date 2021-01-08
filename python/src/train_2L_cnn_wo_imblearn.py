@@ -25,10 +25,6 @@ import matplotlib
 rcParams['font.family'] = ['Noto Sans CJK JP']
 matplotlib.font_manager._rebuild()
 
-# データの不均衡性への対策
-from imblearn.keras import balanced_batch_generator
-from imblearn.under_sampling import NearMiss
-
 gpu_id = 0
 physical_devices = tf.config.list_physical_devices('GPU')
 tf.config.list_physical_devices('GPU')
@@ -36,7 +32,7 @@ tf.config.set_visible_devices(physical_devices[gpu_id], 'GPU')
 tf.config.experimental.set_memory_growth(physical_devices[gpu_id], True)
 
 # parameter
-MODEL_NAME = "2L_CNN"
+MODEL_NAME = "2L_CNN_wo_imblearn"
 MAX_LENGTH = 3000
 EPOCH = 400
 # EPOCH = 200
@@ -236,33 +232,15 @@ def train(data, embedding_matrix, batch_size=BATCH_SIZE, epoch_count=100, max_le
         period=1,
     )
 
-    # データの不均衡性への対策
-    training_generator, steps_per_epoch = balanced_batch_generator(
-        train_inputs, train_targets, sampler=NearMiss(), batch_size=8, random_state=42)
-        # train_inputs, train_targets, sampler=NearMiss(), batch_size=batch_size, random_state=42)
-    # validation_generator, validation_steps = balanced_batch_generator(
-        validation_inputs, validation_targets, sampler=NearMiss(), batch_size=8, random_state=42)
-        # validation_inputs, validation_targets, sampler=NearMiss(), batch_size=batch_size, random_state=42)
-
     print(steps_per_epoch)
     # 学習
-    history = model.fit_generator(generator=training_generator,
-            steps_per_epoch=steps_per_epoch,
-            epochs=epoch_count,
-            verbose=1,
-            validation_data=validation_generator,
-            validation_steps=validation_steps,
-            # validation_data=(validation_inputs, validation_targets),
-            callbacks=[checkpoint],
-            shuffle=True)
-
-    # history = model.fit(train_inputs, train_targets,
-    #           epochs=epoch_count,
-    #           batch_size=batch_size,
-    #           verbose=1,
-    #           validation_data=(validation_inputs, validation_targets),
-    #           callbacks=[checkpoint],
-    #           shuffle=True)
+    history = model.fit(train_inputs, train_targets,
+              epochs=epoch_count,
+              batch_size=batch_size,
+              verbose=1,
+              validation_data=(validation_inputs, validation_targets),
+              callbacks=[checkpoint],
+              shuffle=True)
 
     # 最良の結果を残したモデルを読み込む
     model = load_model(model_filepath)
