@@ -53,7 +53,7 @@ struct DayTimeline: View {
     var year: Int
     var month: Int
     var day: Int
-//    var d: String // 曜日
+    var weekday: String // 曜日
     
     @ObservedObject var apiClient = ApiClient()
     
@@ -62,12 +62,26 @@ struct DayTimeline: View {
         self.month = month
         self.day = day
         
+        let year_s = year.description
+        let month_s = month < 10 ? "0"+month.description : month.description
+        let day_s = day < 10 ? "0"+day.description : day.description
+        let s = year_s + month_s + day_s
+
+        let df = DateFormatter()
+        df.dateFormat = "yyyyMMdd"
+        df.locale = Locale(identifier: "ja_JP")
+
+        guard let d = df.date(from: s) else { fatalError() }
+        guard let dc = df.calendar?.component(.weekday, from: d) else { fatalError() }
+
+        self.weekday = df.shortWeekdaySymbols[dc - 1]
+        
         apiClient.getDailyEvents(year: year, month: month, day: day)
     }
     
     
     var body: some View {
-        Text(year.description+"年\(month)月\(day)日").font(.title)
+        Text(year.description+"年\(month)月\(day)日 (\(self.weekday))").font(.title)
         ScrollView(.vertical) {
             ZStack {
                 // 時間軸
