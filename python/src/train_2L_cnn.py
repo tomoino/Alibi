@@ -130,13 +130,11 @@ def plot_confusion_matrix(cmx, classes, metrics_dir, normalize=False, title='Con
 
     plt.show()
 
+# モデルの可視化
+def visualize_model(model, save_path):
+    plot_model(model, to_file=save_path)
+
 def train(data, embedding_matrix, batch_size=BATCH_SIZE, epoch_count=100, max_length=MAX_LENGTH, model_filepath=f"../model/model_{MODEL_NAME}.h5", learning_rate=0.001):
-    # train:validation:test = 6:2:2
-    # test_len = int(len(inputs) * 0.2)
-    # test_inputs = inputs[0:test_len]
-    # test_targets = targets[0:test_len]
-    # train_inputs = inputs[test_len:]
-    # train_targets = targets[test_len:]
     test_data = []
     train_data = []
     validation_data = []
@@ -244,25 +242,16 @@ def train(data, embedding_matrix, batch_size=BATCH_SIZE, epoch_count=100, max_le
 
     # モデルの保存
     model.save(model_filepath)
+
+    # モデルを可視化した画像の保存
+    visualize_model(model, f"../result/{MODEL_NAME}/model.png"):
+
     return history
 
 if __name__ == "__main__":
     embedding_matrix, word_index = load_word_vec("../data/w2v.txt")
 
     docs = load_data("../data/documents.csv", word_index)
-
-    # input_values = []
-    # target_values = []
-    # for target_value, input_value in docs:
-    #     input_values.append(input_value)
-    #     target_values.append(target_value)
-
-    # カテゴリごとに含まれる数を表示
-    # count_by_categories = {key: np.argmax(target_values, 1).tolist().count(category_dict[key]) for key in CATEGORIES}
-    # print(count_by_categories)
-
-    # input_values = np.array(input_values)
-    # target_values = np.array(target_values)
 
     history = train(docs, embedding_matrix, epoch_count=EPOCH)
     history_df = pd.DataFrame(history.history)
