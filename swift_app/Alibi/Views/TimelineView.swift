@@ -67,7 +67,7 @@ struct DayTimeline: View {
     
     
     var body: some View {
-        Text("\(year)年\(month)月\(day)日").font(.title)
+        Text(year.description+"年\(month)月\(day)日").font(.title)
         ScrollView(.vertical) {
             ZStack {
                 // 時間軸
