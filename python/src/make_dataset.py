@@ -1,4 +1,4 @@
-# URL listを読み込んで、スクレイピングして
+# URL listを読み込んで、スクレイピングしてデータセットを作る
 import sys
 import requests
 from bs4 import BeautifulSoup
@@ -17,7 +17,7 @@ def load_url_list(filepath):
 
     return url_list
 
-url_list = load_url_list("../data/history_UTF.csv")
+url_list = load_url_list("../data/history.csv")
 
 data = [] # 出力するデータを格納 [[text,category],...]
 lenlist = []
