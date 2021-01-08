@@ -65,6 +65,10 @@ def load_data(filepath, word_index, max_length=MAX_LENGTH):
     with open(filepath,'r',encoding="utf-8") as f:
         for l in f:
             row = l.replace("\n", "").split(",")
+                        
+            # CATEGORIESにないカテゴリの行は無視する
+            if row[-1] not in CATEGORIES:
+                continue
             
             category = [1 if i == category_dict[row[-1]] else 0 for i in range(len(category_dict))] # 正解ラベルだけ1にした配列
             words = [word_index[word] for word in row[0].split(' ') if word in word_index] # 単語埋め込み：word_indexに変換
