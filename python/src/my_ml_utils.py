@@ -198,12 +198,18 @@ def model_evaluate(model, test_inputs, test_targets):
     print('Test on '+str(len(test_inputs))+' examples')
     print('Test loss:', score[0])
     print('Test accuracy:', score[1])
+    with open(f'{result_dir}/result.txt', 'w') as f:
+        print('Test on '+str(len(test_inputs))+' examples', file=f)
+        print('Test loss:', score[0], file=f)
+        print('Test accuracy:', score[1], file=f)
 
 def classification_evaluate(model, test_inputs, test_targets, result_dir):
     predict_classes = model.predict_classes(test_inputs)
     true_classes = np.argmax(test_targets, 1)
 
     print(classification_report(true_classes, predict_classes, labels=list(range(0, len(CATEGORIES))), target_names=CATEGORIES))
+    with open(f'{result_dir}/result.txt', 'a') as f:
+        print(classification_report(true_classes, predict_classes, labels=list(range(0, len(CATEGORIES))), target_names=CATEGORIES), file=f)
     cmx = confusion_matrix(true_classes, predict_classes)
     plot_confusion_matrix(cmx=cmx, classes=CATEGORIES, metrics_dir=result_dir, normalize=False, title='Confusion matrix', cmap=plt.cm.Blues)
 

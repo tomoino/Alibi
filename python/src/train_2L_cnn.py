@@ -136,7 +136,7 @@ def train(_train_data, test_data, embedding_matrix, batch_size=BATCH_SIZE, epoch
     history = model.fit_generator(generator=training_generator,
             steps_per_epoch=steps_per_epoch,
             epochs=epoch_count,
-            verbose=0,
+            verbose=1,
             validation_data=validation_generator,
             validation_steps=validation_steps,
             callbacks=[checkpoint],
