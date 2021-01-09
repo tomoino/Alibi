@@ -1,32 +1,14 @@
 #coding: utf-8
 # 2層CNNによる実装
 import numpy as np
+from numpy import *
 import tensorflow as tf
-import tensorflow.keras as keras
-
+import tensorflow.keras as kera
 from tensorflow.keras.optimizers import *
 from tensorflow.keras.layers import *
 from tensorflow.keras.callbacks import *
 from tensorflow.keras.models import *
-from tensorflow.keras.utils import plot_model
-from numpy import *
-import codecs
-import pandas as pd
-import matplotlib.pyplot as plt
-import csv
-
-from sklearn.metrics import confusion_matrix
-from sklearn.metrics import classification_report
-import itertools
-
-from matplotlib import rcParams
-import matplotlib
-
 import my_ml_utils as ml
-
-# matplotlib 日本語対応
-rcParams['font.family'] = ['Noto Sans CJK JP']
-matplotlib.font_manager._rebuild()
 
 # データの不均衡性への対策
 from imblearn.keras import balanced_batch_generator
@@ -48,98 +30,6 @@ category_dict = {}
 # category_dict = {"プロ研": 0, "回路理論": 1, "多変量解析": 2, "ビジネス":3, "電生実験": 4, "OS": 5, "論文読み": 6, "開発環境構築": 7, "語学": 8}
 for category in CATEGORIES:
     category_dict[category] = CATEGORIES.index(category)
-
-# word2vecからembedding layer用の重み行列を作成。wordとindexを結びつける辞書word_indexも返す。
-# predict用にword_index.csvも生成する
-def load_word_vec(filepath):
-    word_index = {}
-    embedding_matrix = []
-
-    with open(filepath,'r',encoding="utf-8_sig") as f:
-        for l in f:
-            row = l.replace("\n", "").split(" ")
-            if len(row) != 101: # 例外が起きる行は無視する
-                continue
-            word = row[0]
-            vec = [float(val) for val in row[1:]]
-            embedding_matrix.append(vec)
-            word_index[word] = len(embedding_matrix)
-
-    # padding用(入力の時系列方向の長さを揃えるためにtoken id=0でpaddingする想定)にindexを追加
-    word_index['0'] = 0
-
-    with open('../data/word_index.csv', 'w', newline="") as f:
-        writer = csv.writer(f)
-        for key, val in word_index.items():
-            try:
-                writer.writerow([key,val])
-            except:
-                continue
-
-    return np.array(embedding_matrix), word_index
-
-def load_data(filepath, word_index, max_length=MAX_LENGTH):
-    data = []
-
-    with open(filepath,'r',encoding="utf-8") as f:
-        for l in f:
-            row = l.replace("\n", "").split(",")
-            
-            # CATEGORIESにないカテゴリの行は無視する
-            if row[-1] not in CATEGORIES:
-                continue
-
-            # category = [1 if i == category_dict[row[-1]] else 0 for i in range(len(category_dict))] # 正解ラベルだけ1にした配列
-            category = category_dict[row[-1]] 
-            words = [word_index[word] for word in row[0].split(' ') if word in word_index] # 単語埋め込み：word_indexに変換
-
-            # 長さをそろえる
-            if len(words) > max_length:
-                words = words[0:max_length]
-            elif len(words) < max_length:
-                words = words + [0] * (max_length - len(words))
-                
-            data.append((category,words))
-
-    random.shuffle(data)
-    print(str(len(data)) + ' data are available')
-    
-    return data
-
-# confusion matrix の作成
-def plot_confusion_matrix(cmx, classes, metrics_dir, normalize=False, title='Confusion matrix', cmap=plt.cm.Blues):
-    if normalize:
-        cmx = cmx.astype('float') / cmx.sum(axis=1)[:, np.newaxis]
-        print('Normalized confusion matrix\n')
-    else:
-        print('Confusion matrix, without normalization\n')
-
-    plt.figure(figsize=(8.0, 8.0))
-    plt.imshow(cmx, interpolation='nearest', cmap=cmap)
-    plt.title(title)
-    plt.colorbar()
-    tick_marks = np.arange(len(classes))
-    plt.xticks(tick_marks, classes, rotation=45)
-    plt.yticks(tick_marks, classes)
-    plt.ylim(len(classes) - 0.5, -0.5)
-
-    fmt = '.2f' if normalize else 'd'
-    thresh = cmx.max() / 2.
-    for i, j in itertools.product(range(cmx.shape[0]), range(cmx.shape[1])):
-        plt.text(j, i, format(cmx[i, j], fmt), horizontalalignment='center', color='white' if cmx[i, j] > thresh else 'black')
-    
-    plt.tight_layout()
-    plt.ylabel('True lable')
-    plt.xlabel('Predicted label')
-
-    cmx_path = metrics_dir + '/cmx.png'
-    plt.savefig(cmx_path, bbox_inches='tight')
-
-    plt.show()
-
-# モデルの可視化
-def visualize_model(model, save_path):
-    plot_model(model, to_file=save_path)
 
 def train(_train_data, test_data, embedding_matrix, batch_size=BATCH_SIZE, epoch_count=100, max_length=MAX_LENGTH, model_name="model", learning_rate=0.001):
     random.shuffle(_train_data)
