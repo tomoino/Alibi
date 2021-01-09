@@ -29,6 +29,7 @@ matplotlib.font_manager._rebuild()
 # データの不均衡性への対策
 from imblearn.keras import balanced_batch_generator
 import pickle
+import gc
 
 gpu_id = 0
 physical_devices = tf.config.list_physical_devices('GPU')
@@ -214,13 +215,46 @@ def save_history(history, result_dir):
     history_df.loc[:,['val_accuracy','accuracy']].plot()
     plt.savefig(f"{result_dir}/accuracy.png")
 
-def ensemble_predict_classes(models, inputs):
-	preds = [model.predict(inputs) for model in models]
-	preds = np.array(preds)
+def ensemble_predict_classes(model_names, inputs):
+    preds = []
 
-	# sum across ensemble members
-	summed = np.sum(preds, axis=0)
-	# argmax across classes
-	result = argmax(preds, axis=1)
+    for model_name in model_names:
+        model = load_model(f"../model/model_{model_name}.h5")
+        pred = model.predict(inputs) 
+        preds.append(pred)
+        del model
+        keras.backend.clear_session() # ←これです
+        gc.collect()
+    # preds = [model.predict(inputs) for model in models]
+    
+    preds = np.array(preds)
 
-	return result
+    summed = np.sum(preds, axis=0)
+    result = argmax(summed, axis=1)
+
+    return result
+
+def split_inputs_and_targets(data):
+    inputs = []
+    targets = []
+
+    for target_value, input_value in data:
+        inputs.append(input_value)
+        targets.append([1 if i == target_value else 0 for i in range(len(category_dict))])  # 正解ラベルだけ1にした配列
+        
+    inputs = np.array(inputs)
+    targets = np.array(targets)
+
+    return inputs, targets
+
+def evaluate_ensemble_models(model_name, model_names):
+    result_dir = f"../result/{model_name}"
+    _, _, test_data = load_dataset()
+    test_inputs, test_targets = split_inputs_and_targets(test_data)
+
+    predict_classes = ensemble_predict_classes(model_names, test_inputs)
+    true_classes = np.argmax(test_targets, 1)
+
+    print(classification_report(true_classes, predict_classes, labels=list(range(0, len(CATEGORIES))), target_names=CATEGORIES))
+    cmx = confusion_matrix(true_classes, predict_classes)
+    plot_confusion_matrix(cmx=cmx, classes=CATEGORIES, metrics_dir=result_dir, normalize=False, title='Confusion matrix', cmap=plt.cm.Blues)
