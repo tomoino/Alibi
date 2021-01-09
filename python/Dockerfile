@@ -2,10 +2,6 @@ FROM nvcr.io/nvidia/tensorflow:20.03-tf2-py3
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-# MeCab
-# RUN apt-get update
-# RUN apt-get upgrade -y
-# RUN apt-get install -y libmecab2 libmecab-dev mecab mecab-utils nkf
 RUN apt-get update && apt-get install -y \
   sudo \
   wget \

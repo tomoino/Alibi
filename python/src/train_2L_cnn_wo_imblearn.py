@@ -16,6 +16,7 @@ import matplotlib.pyplot as plt
 import csv
 
 from sklearn.metrics import confusion_matrix
+from sklearn.metrics import classification_report
 import itertools
 
 from matplotlib import rcParams
@@ -34,7 +35,7 @@ tf.config.experimental.set_memory_growth(physical_devices[gpu_id], True)
 # parameter
 MODEL_NAME = "2L_CNN_wo_imblearn"
 MAX_LENGTH = 3000
-EPOCH = 400
+EPOCH = 200
 # EPOCH = 200
 BATCH_SIZE = 32
 CATEGORIES = ["プロ研", "回路理論", "多変量解析", "ビジネス", "電生実験", "OS", "論文読み", "開発環境構築"]
@@ -197,7 +198,7 @@ def train(data, embedding_matrix, batch_size=BATCH_SIZE, epoch_count=100, max_le
     
     # 単語数、embeddingの次元
     num_words, word_vec_size = embedding_matrix.shape
-    # モデルの構築 RNN
+    # モデルの構築
     model = Sequential([
         Embedding(num_words, word_vec_size,
                 weights=[embedding_matrix], 
@@ -232,7 +233,6 @@ def train(data, embedding_matrix, batch_size=BATCH_SIZE, epoch_count=100, max_le
         period=1,
     )
 
-    print(steps_per_epoch)
     # 学習
     history = model.fit(train_inputs, train_targets,
               epochs=epoch_count,
@@ -252,6 +252,8 @@ def train(data, embedding_matrix, batch_size=BATCH_SIZE, epoch_count=100, max_le
 
     predict_classes = model.predict_classes(test_inputs)
     true_classes = np.argmax(test_targets, 1)
+
+    print(classification_report(true_classes, predict_classes, labels=list(range(0, len(CATEGORIES))), target_names=CATEGORIES))
     cmx = confusion_matrix(true_classes, predict_classes)
     plot_confusion_matrix(cmx=cmx, classes=CATEGORIES, metrics_dir=f"../result/{MODEL_NAME}", normalize=False, title='Confusion matrix', cmap=plt.cm.Blues)
 

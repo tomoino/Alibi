@@ -28,7 +28,7 @@ matplotlib.font_manager._rebuild()
 
 # データの不均衡性への対策
 from imblearn.keras import balanced_batch_generator
-from imblearn.under_sampling import NearMiss
+import pickle
 
 gpu_id = 0
 physical_devices = tf.config.list_physical_devices('GPU')
@@ -37,13 +37,13 @@ tf.config.set_visible_devices(physical_devices[gpu_id], 'GPU')
 tf.config.experimental.set_memory_growth(physical_devices[gpu_id], True)
 
 # parameter
-MODEL_NAME = "2L_CNN"
+MODEL_NAME = "2L_CNN_ENSEMBLE"
 MAX_LENGTH = 3000
-EPOCH = 400
-# EPOCH = 200
+EPOCH = 1
 BATCH_SIZE = 32
 CATEGORIES = ["プロ研", "回路理論", "多変量解析", "ビジネス", "電生実験", "OS", "論文読み", "開発環境構築"]
 # CATEGORIES = ["プロ研", "回路理論", "多変量解析", "ビジネス", "電生実験", "OS", "論文読み", "開発環境構築", "語学"]
+MODEL_NUM = 5 # アンサンブルに使うモデルの数
 
 category_dict = {}
 # category_dict = {"プロ研": 0, "回路理論": 1, "多変量解析": 2, "ビジネス":3, "電生実験": 4, "OS": 5, "論文読み": 6, "開発環境構築": 7, "語学": 8}
@@ -142,7 +142,41 @@ def plot_confusion_matrix(cmx, classes, metrics_dir, normalize=False, title='Con
 def visualize_model(model, save_path):
     plot_model(model, to_file=save_path)
 
-def train(data, embedding_matrix, batch_size=BATCH_SIZE, epoch_count=100, max_length=MAX_LENGTH, model_filepath=f"../model/model_{MODEL_NAME}.h5", learning_rate=0.001):
+# 学習で共通して使うデータをpickleにして保存する
+def save_dataset():
+    embedding_matrix, word_index = load_word_vec("../data/w2v.txt")
+    data = load_data("../data/documents.csv", word_index)
+
+    test_data = []
+    train_data = []
+
+    test_data_rate = 0.2 # testの割合
+
+    categorized_data = {category_dict[category]: [] for category in CATEGORIES}  # カテゴリごとに分けられたデータ
+    for target_value, input_value in data:
+        categorized_data[target_value].append((target_value, input_value))
+
+    # train, validation, test データのカテゴリ組成を等しくする
+    for category_id in categorized_data:
+        data_len = len(categorized_data[category_id])
+        test_boundary = int(data_len * test_data_rate)
+
+        test_data += categorized_data[category_id][0:test_boundary]
+        train_data += categorized_data[category_id][test_boundary:]
+    
+    with open(f'../data/embedding_matrix.pickle', 'wb') as f:
+        pickle.dump(embedding_matrix, f)
+
+    with open(f'../data/word_index.pickle', 'wb') as f:
+        pickle.dump(word_index, f)
+    
+    with open(f'../data/test_data.pickle', 'wb') as f:
+        pickle.dump(test_data, f)
+
+    with open(f'../data/train_data.pickle', 'wb') as f:
+        pickle.dump(train_data, f)
+
+def train(data, embedding_matrix, batch_size=BATCH_SIZE, epoch_count=100, max_length=MAX_LENGTH, model_filepath=f"../model/model_{MODEL_NAME}.h5", result_dir=f"../result/{MODEL_NAME}", learning_rate=0.001):
     test_data = []
     train_data = []
     validation_data = []
@@ -158,11 +192,16 @@ def train(data, embedding_matrix, batch_size=BATCH_SIZE, epoch_count=100, max_le
     for category_id in categorized_data:
         data_len = len(categorized_data[category_id])
         test_boundary = int(data_len * test_data_rate)
-        validation_boundary = int(data_len * (test_data_rate + validation_data_rate))
 
         test_data += categorized_data[category_id][0:test_boundary]
-        validation_data += categorized_data[category_id][test_boundary:validation_boundary]
-        train_data += categorized_data[category_id][validation_boundary:]
+
+        # train と validation　はシャッフルしてから分ける　（ブートストラップ）
+        shuffled_train_data = categorized_data[category_id][test_boundary:]
+        random.shuffle(shuffled_train_data)
+        validation_boundary = int(data_len * validation_data_rate)
+
+        validation_data += shuffled_train_data[0:validation_boundary]
+        train_data += shuffled_train_data[validation_boundary:]
     
     test_inputs = []
     test_targets = []
@@ -199,7 +238,7 @@ def train(data, embedding_matrix, batch_size=BATCH_SIZE, epoch_count=100, max_le
     train_targets = np.array(train_targets)
     validation_inputs = np.array(validation_inputs)
     validation_targets = np.array(validation_targets)
-    
+
     # 単語数、embeddingの次元
     num_words, word_vec_size = embedding_matrix.shape
     # モデルの構築
@@ -240,31 +279,20 @@ def train(data, embedding_matrix, batch_size=BATCH_SIZE, epoch_count=100, max_le
     # データの不均衡性への対策
     training_generator, steps_per_epoch = balanced_batch_generator(
         train_inputs, train_targets, batch_size=8, random_state=42)
-        # train_inputs, train_targets, sampler=NearMiss(), batch_size=8, random_state=42)
-        # train_inputs, train_targets, sampler=NearMiss(), batch_size=batch_size, random_state=42)
     validation_generator, validation_steps = balanced_batch_generator(
         validation_inputs, validation_targets, batch_size=8, random_state=42)
-        # validation_inputs, validation_targets, sampler=NearMiss(), batch_size=batch_size, random_state=42)
 
     # 学習
     history = model.fit_generator(generator=training_generator,
             steps_per_epoch=steps_per_epoch,
             epochs=epoch_count,
-            verbose=1,
+            verbose=0,
             validation_data=validation_generator,
             validation_steps=validation_steps,
-            # validation_data=(validation_inputs, validation_targets),
             callbacks=[checkpoint],
             shuffle=True)
 
-    # history = model.fit(train_inputs, train_targets,
-    #           epochs=epoch_count,
-    #           batch_size=batch_size,
-    #           verbose=1,
-    #           validation_data=(validation_inputs, validation_targets),
-    #           callbacks=[checkpoint],
-    #           shuffle=True)
-
+    # モデルごとに評価
     # 最良の結果を残したモデルを読み込む
     model = load_model(model_filepath)
 
@@ -278,22 +306,57 @@ def train(data, embedding_matrix, batch_size=BATCH_SIZE, epoch_count=100, max_le
 
     print(classification_report(true_classes, predict_classes, labels=list(range(0, len(CATEGORIES))), target_names=CATEGORIES))
     cmx = confusion_matrix(true_classes, predict_classes)
-    plot_confusion_matrix(cmx=cmx, classes=CATEGORIES, metrics_dir=f"../result/{MODEL_NAME}", normalize=False, title='Confusion matrix', cmap=plt.cm.Blues)
+    plot_confusion_matrix(cmx=cmx, classes=CATEGORIES, metrics_dir=result_dir, normalize=False, title='Confusion matrix', cmap=plt.cm.Blues)
 
     # モデルを可視化した画像の保存
-    visualize_model(model, f"../result/{MODEL_NAME}/model.png")
+    visualize_model(model, f"{result_dir}/model.png")
 
-    return history
+    return history, model, test_inputs, test_targets
+
+def ensemble_predict_classes(models, inputs):
+	preds = [model.predict(inputs) for model in models]
+	preds = np.array(preds)
+
+	# sum across ensemble members
+	summed = np.sum(preds, axis=0)
+	# argmax across classes
+	result = argmax(preds, axis=1)
+
+	return result
+
+def ensemble_train(data, embedding_matrix, epoch_count=100):
+    models = []
+    test_inputs = []
+    test_targets = []
+
+    # 学習
+    for model_num in range(MODEL_NUM):
+        result_dir = f"../result/{MODEL_NAME}/{model_num}"
+        print(f"--- MODEL {model_num} -------------------------------------------")
+        history = train(data, embedding_matrix, epoch_count=EPOCH, model_filepath=f"../model/model_{MODEL_NAME}_{model_num}.h5", result_dir=result_dir)
+        history, model, test_inputs, test_targets = train(data, embedding_matrix, epoch_count=EPOCH, model_filepath=f"../model/model_{MODEL_NAME}_{model_num}.h5", result_dir=result_dir)
+        models.append(model)
+        
+        history_df = pd.DataFrame(history.history)
+
+        history_df.loc[:,['val_loss','loss']].plot()
+        plt.savefig(f"{result_dir}/loss.png")
+        history_df.loc[:,['val_accuracy','accuracy']].plot()
+        plt.savefig(f"{result_dir}/accuracy.png")
+
+    # 評価
+    print(f"--- ENSEMBLE MODEL -------------------------------------------")
+    predict_classes = ensemble_predict_classes(models, test_inputs)
+    true_classes = np.argmax(test_targets, 1)
+
+    print(classification_report(true_classes, predict_classes, labels=list(range(0, len(CATEGORIES))), target_names=CATEGORIES))
+    cmx = confusion_matrix(true_classes, predict_classes)
+    plot_confusion_matrix(cmx=cmx, classes=CATEGORIES, metrics_dir=result_dir, normalize=False, title='Confusion matrix', cmap=plt.cm.Blues)
+
 
 if __name__ == "__main__":
     embedding_matrix, word_index = load_word_vec("../data/w2v.txt")
 
     docs = load_data("../data/documents.csv", word_index)
 
-    history = train(docs, embedding_matrix, epoch_count=EPOCH)
-    history_df = pd.DataFrame(history.history)
-
-    history_df.loc[:,['val_loss','loss']].plot()
-    plt.savefig(f"../result/{MODEL_NAME}/loss.png")
-    history_df.loc[:,['val_accuracy','accuracy']].plot()
-    plt.savefig(f"../result/{MODEL_NAME}/accuracy.png")
+    ensemble_train(docs, embedding_matrix, epoch_count=EPOCH)
