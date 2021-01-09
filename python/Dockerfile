@@ -2,10 +2,6 @@ FROM nvcr.io/nvidia/tensorflow:20.03-tf2-py3
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-# MeCab
-# RUN apt-get update
-# RUN apt-get upgrade -y
-# RUN apt-get install -y libmecab2 libmecab-dev mecab mecab-utils nkf
 RUN apt-get update && apt-get install -y \
   sudo \
   wget \
@@ -17,7 +13,10 @@ RUN apt-get update && apt-get install -y \
   make \
   curl \
   xz-utils \
-  file
+  file \
+  graphviz
+
+RUN apt install fonts-noto-cjk
 
 RUN git clone --depth 1 https://github.com/neologd/mecab-ipadic-neologd.git ; exit 0
 RUN cd mecab-ipadic-neologd && \
@@ -30,6 +29,10 @@ RUN pip install matplotlib
 RUN pip install tensorflowjs
 RUN pip install bs4
 RUN pip install mecab-python3
+RUN pip install sklearn
+RUN pip install graphviz
+RUN pip install pydotplus
+RUN pip install imblearn
 
 # duser setting
 ARG USER_ID

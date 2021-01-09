@@ -1,4 +1,5 @@
 #coding: utf-8
+# 3層CNNによる実装
 import numpy as np
 import tensorflow as tf
 import tensorflow.keras as keras
@@ -24,6 +25,11 @@ MAX_LENGTH = 3000;
 EPOCH = 200;
 BATCH_SIZE = 32;
 CATEGORIES = ["プロ研", "回路理論", "多変量解析", "ビジネス", "電生実験", "OS", "論文読み", "開発環境構築", "語学"]
+
+category_dict = {}
+# category_dict = {"プロ研": 0, "回路理論": 1, "多変量解析": 2, "ビジネス":3, "電生実験": 4, "OS": 5, "論文読み": 6, "開発環境構築": 7, "語学": 8}
+for category in CATEGORIES:
+    category_dict[category] = CATEGORIES.index(category)
 
 # word2vecからembedding layer用の重み行列を作成。wordとindexを結びつける辞書word_indexも返す。
 # predict用にword_index.csvも生成する
@@ -56,16 +62,15 @@ def load_word_vec(filepath):
 
 def load_data(filepath, word_index, max_length=MAX_LENGTH):
     data = []
-    category_dict = {}
-
-    for category in CATEGORIES:
-        category_dict[category] = CATEGORIES.index(category)
-    # category_dict = {"プロ研": 0, "回路理論": 1, "多変量解析": 2, "ビジネス":3, "電生実験": 4, "OS": 5, "論文読み": 6, "開発環境構築": 7, "語学": 8}
-
+    
     with open(filepath,'r',encoding="utf-8") as f:
         for l in f:
             row = l.replace("\n", "").split(",")
-            
+                        
+            # CATEGORIESにないカテゴリの行は無視する
+            if row[-1] not in CATEGORIES:
+                continue
+
             category = [1 if i == category_dict[row[-1]] else 0 for i in range(len(category_dict))] # 正解ラベルだけ1にした配列
             words = [word_index[word] for word in row[0].split(' ') if word in word_index] # 単語埋め込み：word_indexに変換
 
@@ -117,10 +122,10 @@ def train(inputs, targets, embedding_matrix, batch_size=BATCH_SIZE, epoch_count=
     #Embedding層は学習しないようする
     model.layers[0].trainable = False
 
-    model.compile(loss='categorical_crossentropy',
-              optimizer=keras.optimizers.Adam(1e-4),
-              metrics=['accuracy'])
-    # model.compile(optimizer='rmsprop', loss='categorical_crossentropy', metrics=['accuracy'])
+    # model.compile(loss='categorical_crossentropy',
+    #           optimizer=keras.optimizers.Adam(1e-4),
+    #           metrics=['accuracy'])
+    model.compile(optimizer='rmsprop', loss='categorical_crossentropy', metrics=['accuracy'])
 
 
     # 学習
@@ -150,6 +155,11 @@ if __name__ == "__main__":
     for target_value, input_value in docs:
         input_values.append(input_value)
         target_values.append(target_value)
+        
+    # カテゴリごとに含まれる数を表示
+    count_by_categories = {key: target_values.count(category_dict[key]) for key in CATEGORIES}
+    print(count_by_categories)
+
     input_values = np.array(input_values)
     target_values = np.array(target_values)
 
