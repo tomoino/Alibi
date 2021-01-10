@@ -193,12 +193,19 @@ def load_dataset():
 
     return embedding_matrix, train_data, test_data
 
-def model_evaluate(model, test_inputs, test_targets):
+def save_hyparameters(result_dir, model_name, epoch, batch_size, lr):
+    with open(f'{result_dir}/result.txt', 'w') as f:
+        print(f'MODEL: {model_name}', file=f)
+        print(f'epoch: {epoch}', file=f)
+        print(f'batch_size: {batch_size}', file=f)
+        print(f'learning_rate: {lr}', file=f)
+
+def model_evaluate(model, test_inputs, test_targets, result_dir):
     score = model.evaluate(test_inputs, test_targets, verbose=0)
     print('Test on '+str(len(test_inputs))+' examples')
     print('Test loss:', score[0])
     print('Test accuracy:', score[1])
-    with open(f'{result_dir}/result.txt', 'w') as f:
+    with open(f'{result_dir}/result.txt', 'a') as f:
         print('Test on '+str(len(test_inputs))+' examples', file=f)
         print('Test loss:', score[0], file=f)
         print('Test accuracy:', score[1], file=f)
@@ -229,7 +236,7 @@ def ensemble_predict_classes(model_names, inputs):
         pred = model.predict(inputs) 
         preds.append(pred)
         del model
-        keras.backend.clear_session() # ←これです
+        keras.backend.clear_session()
         gc.collect()
     # preds = [model.predict(inputs) for model in models]
     
@@ -262,5 +269,7 @@ def evaluate_ensemble_models(model_name, model_names):
     true_classes = np.argmax(test_targets, 1)
 
     print(classification_report(true_classes, predict_classes, labels=list(range(0, len(CATEGORIES))), target_names=CATEGORIES))
+    with open(f'{result_dir}/result.txt', 'w') as f:
+        print(classification_report(true_classes, predict_classes, labels=list(range(0, len(CATEGORIES))), target_names=CATEGORIES), file=f)
     cmx = confusion_matrix(true_classes, predict_classes)
     plot_confusion_matrix(cmx=cmx, classes=CATEGORIES, metrics_dir=result_dir, normalize=False, title='Confusion matrix', cmap=plt.cm.Blues)
