@@ -19,6 +19,10 @@ struct TimelineView: View {
         
         for j in [12, 1] {
             for i in 1 ... 31 {
+                if j == 12 && i < 11 {
+                    continue
+                }
+                
                 var k = 2020
                 if j == 1 {
                     k = 2021
