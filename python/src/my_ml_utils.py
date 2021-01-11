@@ -181,9 +181,6 @@ def save_dataset():
 def load_dataset():
     with open(f'../data/embedding_matrix.pickle', 'rb') as f:
         embedding_matrix = pickle.load(f)
-
-    # with open(f'../data/word_index.pickle', 'rb') as f:
-    #     word_index = pickle.load(f)
     
     with open(f'../data/test_data.pickle', 'rb') as f:
         test_data = pickle.load(f)
@@ -192,6 +189,13 @@ def load_dataset():
         train_data = pickle.load(f)
 
     return embedding_matrix, train_data, test_data
+
+
+def load_word_index():
+    with open(f'../data/word_index.pickle', 'rb') as f:
+        word_index = pickle.load(f)
+
+    return word_index
 
 def save_hyparameters(result_dir, model_name, epoch, batch_size, lr):
     with open(f'{result_dir}/result.txt', 'w') as f:
@@ -228,7 +232,7 @@ def save_history(history, result_dir):
     history_df.loc[:,['val_accuracy','accuracy']].plot()
     plt.savefig(f"{result_dir}/accuracy.png")
 
-def ensemble_predict_classes(model_names, inputs):
+def ensemble_predict(model_names, inputs):
     preds = []
 
     for model_name in model_names:
@@ -238,11 +242,15 @@ def ensemble_predict_classes(model_names, inputs):
         del model
         keras.backend.clear_session()
         gc.collect()
-    # preds = [model.predict(inputs) for model in models]
     
     preds = np.array(preds)
 
     summed = np.sum(preds, axis=0)
+
+    return summed
+
+def ensemble_predict_classes(model_names, inputs):
+    summed = ensemble_predict(model_names, inputs)
     result = argmax(summed, axis=1)
 
     return result
