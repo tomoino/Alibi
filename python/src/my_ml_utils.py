@@ -181,9 +181,6 @@ def save_dataset():
 def load_dataset():
     with open(f'../data/embedding_matrix.pickle', 'rb') as f:
         embedding_matrix = pickle.load(f)
-
-    # with open(f'../data/word_index.pickle', 'rb') as f:
-    #     word_index = pickle.load(f)
     
     with open(f'../data/test_data.pickle', 'rb') as f:
         test_data = pickle.load(f)
@@ -193,12 +190,26 @@ def load_dataset():
 
     return embedding_matrix, train_data, test_data
 
-def model_evaluate(model, test_inputs, test_targets):
+
+def load_word_index():
+    with open(f'../data/word_index.pickle', 'rb') as f:
+        word_index = pickle.load(f)
+
+    return word_index
+
+def save_hyparameters(result_dir, model_name, epoch, batch_size, lr):
+    with open(f'{result_dir}/result.txt', 'w') as f:
+        print(f'MODEL: {model_name}', file=f)
+        print(f'epoch: {epoch}', file=f)
+        print(f'batch_size: {batch_size}', file=f)
+        print(f'learning_rate: {lr}', file=f)
+
+def model_evaluate(model, test_inputs, test_targets, result_dir):
     score = model.evaluate(test_inputs, test_targets, verbose=0)
     print('Test on '+str(len(test_inputs))+' examples')
     print('Test loss:', score[0])
     print('Test accuracy:', score[1])
-    with open(f'{result_dir}/result.txt', 'w') as f:
+    with open(f'{result_dir}/result.txt', 'a') as f:
         print('Test on '+str(len(test_inputs))+' examples', file=f)
         print('Test loss:', score[0], file=f)
         print('Test accuracy:', score[1], file=f)
@@ -221,7 +232,7 @@ def save_history(history, result_dir):
     history_df.loc[:,['val_accuracy','accuracy']].plot()
     plt.savefig(f"{result_dir}/accuracy.png")
 
-def ensemble_predict_classes(model_names, inputs):
+def ensemble_predict(model_names, inputs):
     preds = []
 
     for model_name in model_names:
@@ -229,13 +240,17 @@ def ensemble_predict_classes(model_names, inputs):
         pred = model.predict(inputs) 
         preds.append(pred)
         del model
-        keras.backend.clear_session() # ←これです
+        keras.backend.clear_session()
         gc.collect()
-    # preds = [model.predict(inputs) for model in models]
     
     preds = np.array(preds)
 
     summed = np.sum(preds, axis=0)
+
+    return summed
+
+def ensemble_predict_classes(model_names, inputs):
+    summed = ensemble_predict(model_names, inputs)
     result = argmax(summed, axis=1)
 
     return result
@@ -262,5 +277,7 @@ def evaluate_ensemble_models(model_name, model_names):
     true_classes = np.argmax(test_targets, 1)
 
     print(classification_report(true_classes, predict_classes, labels=list(range(0, len(CATEGORIES))), target_names=CATEGORIES))
+    with open(f'{result_dir}/result.txt', 'w') as f:
+        print(classification_report(true_classes, predict_classes, labels=list(range(0, len(CATEGORIES))), target_names=CATEGORIES), file=f)
     cmx = confusion_matrix(true_classes, predict_classes)
     plot_confusion_matrix(cmx=cmx, classes=CATEGORIES, metrics_dir=result_dir, normalize=False, title='Confusion matrix', cmap=plt.cm.Blues)
