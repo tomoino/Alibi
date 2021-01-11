@@ -8,26 +8,28 @@
 import SwiftUI
 
 struct TimelineView: View {
-    @State private var page = 13// 初期値
+    @State private var page = 0// 初期値
     var date = [Int]()
     var pages: [DayTimeline] = []
     @ObservedObject var event_elements = EventElements()
     @ObservedObject var apiClient = ApiClient()
  
     init(){
-//        event_elements = apiClient.getTimelines()
-        
         for j in [12, 1] {
             for i in 1 ... 31 {
                 if j == 12 && i < 11 {
                     continue
                 }
                 
+                if j == 1 || i > 11 {
+                    continue
+                }
+
                 var k = 2020
                 if j == 1 {
                     k = 2021
                 }
-                
+
                 pages.append(DayTimeline(year: k, month: j, day: i))
                 date.append(i)
             }

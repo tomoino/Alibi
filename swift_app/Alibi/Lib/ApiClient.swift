@@ -39,6 +39,8 @@ class ApiClient: ObservableObject {
                 _events = try! JSONDecoder().decode([Event].self, from: data)
                 
                 var sleep_flag = 0 // 睡眠フラグ
+                var CATEGORIES = ["プロ研","回路理論","多変量解析","ビジネス","電生実験","OS","論文読み","開発環境構築"]
+                var REAL_EVENTS = ["入浴","食事","睡眠","インターン","外出"]
                 
                 for _event in _events {
                     var event = _event
@@ -82,20 +84,19 @@ class ApiClient: ObservableObject {
                             }
                         }
                         
-                        let event_categories = event.event.components(separatedBy: ",")
-                        var category_counts: [String: Int] = [:]
-                        
-                        for item in event_categories {
-                            category_counts[item] = (category_counts[item] ?? 0) + 1
-                        }
                         var event_name = ""
-                        var max_counts = 0
+                        // ルールベースで推定した場合
+                        if (REAL_EVENTS.contains(event.event)) {
+                            event_name = event.event
+                        } else { // 閲覧サイトから推定した作業内容がある場合
                         
-                        for (key, value) in category_counts {
-                            if value > max_counts {
-                                event_name = key
-                                max_counts = value
-                            }
+                            let event_categories = event.event.components(separatedBy: ",")
+                            let pred_vec = event_categories.map{Double($0)!}
+                            
+                            let max_num = pred_vec.max()
+                            let max_idx = pred_vec.firstIndex(of: max_num ?? 0)!
+                           
+                            event_name = CATEGORIES[max_idx]
                         }
                         
                         // 配列にすでに要素がある場合
