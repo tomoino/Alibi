@@ -84,34 +84,15 @@ struct PieChart: View {
     var body: some View {
         let y: CGFloat = 0
         let h: CGFloat = 550
-        // material design color: 300
-        let COLORS: [String: Int] = ["プロ研":0xFFB74D, // Orange
-                                     "回路理論":0x4FC3F7, // Light Blue
-                                     "多変量解析":0x7986CB, // Indigo
-                                     "ビジネス":0x4DB6AC, // Teal
-                                     "電生実験":0xFFF176, // Yellow
-                                     "OS":0xAED581, // Light Green
-                                     "論文読み":0xe57373, //Red
-                                     "開発環境構築":0xBA68C8, // Purple
-                                     "入浴":0x9E9E9E,
-                                     "食事":0x9E9E9E,
-                                     "睡眠":0x9E9E9E,
-                                     "インターン":0x9E9E9E,
-                                     "外出":0x9E9E9E]
         
-        HStack(alignment: .top) {
-            Text("合計作業時間")
+        VStack(alignment: .leading) {
+            Text("作業時間割合")
             .font(.system(size: 16, weight: .bold, design: .default))
                 .foregroundColor(Color(hex: 0xffffff))
-            .frame(height: h, alignment: .top)
+            .frame(height: 20, alignment: .top)
             .padding(EdgeInsets(top: CGFloat(15), leading: 10, bottom: 0, trailing: 0))
-//            Text("\(hour):\(min)")
-            Text("5:57")
-            .font(.system(size: 30, weight: .bold, design: .default))
-                .foregroundColor(Color(hex: 0xFFB74D))
-            .frame(height: h, alignment: .top)
-            .padding(EdgeInsets(top: CGFloat(10), leading: 10, bottom: 0, trailing: 10))
-            Spacer()
+            
+            DonutChart(charDataObj: apiClient.report_chart)
         }
         .frame(maxWidth: .infinity, alignment: .top)
         .background(Color(red: 32/255, green: 36/255, blue: 38/255))

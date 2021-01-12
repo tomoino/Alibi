@@ -6,12 +6,14 @@
 //
 
 import Foundation
+import SwiftUI
 
 class ApiClient: ObservableObject {
     @Published var eventData: [Event] = []
     @Published var event_elements = EventElements()
     @Published var daily_events = [EventElement]()
     @Published var report: [String:Int] = [:]
+    @Published var report_chart: ChartDataContainer = ChartDataContainer()
     
     private var baseUrl = "https://alibi-api.herokuapp.com"
     
@@ -242,7 +244,30 @@ class ApiClient: ObservableObject {
                 }
                 self.report["SUM_HOUR"] = length_sum/60
                 self.report["SUM_MIN"] = length_sum - Int(length_sum/60) * 60
+                
                 print(self.report)
+                
+                
+                self.report_chart.chartData = []
+                
+                let COLORS: [String: Int] = ["プロ研":0xFFB74D, // Orange
+                                             "回路理論":0x4FC3F7, // Light Blue
+                                             "多変量解析":0x7986CB, // Indigo
+                                             "ビジネス":0x4DB6AC, // Teal
+                                             "電生実験":0xFFF176, // Yellow
+                                             "OS":0xAED581, // Light Green
+                                             "論文読み":0xe57373, //Red
+                                             "開発環境構築":0xBA68C8, // Purple
+                                             "入浴":0x9E9E9E,
+                                             "食事":0x9E9E9E,
+                                             "睡眠":0x9E9E9E,
+                                             "インターン":0x9E9E9E,
+                                             "外出":0x9E9E9E]
+                
+                for category in CATEGORIES {
+                    let percent = CGFloat(Double(self.report[category]!) / Double(length_sum) * 100.0)
+                    self.report_chart.chartData.append(ChartData(color: Color(hex: COLORS[category] ?? 0xffffff), percent: percent, value: 0))
+                }
             }
         })
         task.resume()
