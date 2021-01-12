@@ -9,13 +9,13 @@ import SwiftUI
 struct ContentView: View {    
     var body: some View {
         TabView {
-            HomeView()
-            .tabItem {
-                VStack {
-                    Image(systemName: "house.fill")
-                    Text("Home")
-                }
-            }.tag(1)
+//            HomeView()
+//            .tabItem {
+//                VStack {
+//                    Image(systemName: "house.fill")
+//                    Text("Home")
+//                }
+//            }.tag(1)
             
             TimelineView()
             .tabItem {
@@ -23,7 +23,7 @@ struct ContentView: View {
                     Image(systemName: "calendar")
                     Text("Timeline")
                 }
-            }.tag(2)
+            }.tag(1)
             
             ReportView()
             .tabItem {
@@ -31,7 +31,7 @@ struct ContentView: View {
                     Image(systemName: "chart.pie.fill")
                     Text("Report")
                 }
-            }.tag(3)
+            }.tag(2)
         }
     }
 }

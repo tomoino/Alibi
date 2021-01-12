@@ -134,20 +134,6 @@ struct EventCard: View {
                                      "睡眠":0x9E9E9E,
                                      "インターン":0x9E9E9E,
                                      "外出":0x9E9E9E]
-        // material design color: 300
-        let FONT_COLORS: [String: Int] = ["プロ研":0xf44336,
-                                     "回路理論":0xF06292,
-                                     "多変量解析":0xBA68C8,
-                                     "ビジネス":0x9575CD,
-                                     "電生実験":0x7986CB,
-                                     "OS":0x64B5F6,
-                                     "論文読み":0x4FC3F7,
-                                     "開発環境構築":0x4DD0E1,
-                                     "入浴":0x4DB6AC,
-                                     "食事":0x81C784,
-                                     "睡眠":0xAED581,
-                                     "インターン":0xDCE775,
-                                     "外出":0xFFF176]
         
         HStack(alignment: .top) {
             Text(event_element.event)
@@ -160,7 +146,7 @@ struct EventCard: View {
         .frame(maxWidth: .infinity, alignment: .top)
 //        .background(Color(red: 32/255, green: 36/255, blue: 38/255))
         .background(Color(hex: COLORS[event_element.event] ?? 0xdddddd, alpha: 0.7))
-        .modifier(CardModifier(color: Color(hex: FONT_COLORS[event_element.event] ?? 0xffffff)))
+        .modifier(CardModifier(color: Color.white))
         .padding(EdgeInsets(top: y, leading: 70, bottom: 0, trailing: 12))
     }
 }
@@ -172,7 +158,7 @@ struct CardModifier: ViewModifier {
             .cornerRadius(5)
             .overlay(
                 RoundedRectangle(cornerRadius: 5)
-                    .stroke(Color.white, lineWidth: 0.3)
+                    .stroke(color, lineWidth: 0.3)
             )
 //            .shadow(color: Color.black.opacity(0.2), radius: 20, x: 0, y: 0)
     }
