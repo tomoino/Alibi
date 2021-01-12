@@ -17,11 +17,7 @@ struct TimelineView: View {
     init(){
         for j in [12, 1] {
             for i in 1 ... 31 {
-                if j == 12 && i < 11 {
-                    continue
-                }
-                
-                if j == 1 || i > 11 {
+                if (j == 12 && i < 11) || (j == 1 && i > 7) {
                     continue
                 }
 

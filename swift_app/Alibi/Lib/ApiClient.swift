@@ -91,6 +91,7 @@ class ApiClient: ObservableObject {
                         } else { // 閲覧サイトから推定した作業内容がある場合
                         
                             let event_categories = event.event.components(separatedBy: ",")
+                            print(event_categories)
                             let pred_vec = event_categories.map{Double($0)!}
                             
                             let max_num = pred_vec.max()
