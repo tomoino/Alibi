@@ -27,6 +27,7 @@
 		B8B11CAF259781C2003CAA1D /* PageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8B11CAE259781C2003CAA1D /* PageViewController.swift */; };
 		B8B11CB725978206003CAA1D /* PageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8B11CB625978206003CAA1D /* PageView.swift */; };
 		B8B11CCA25AD72E6003CAA1D /* HexColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8B11CC925AD72E6003CAA1D /* HexColor.swift */; };
+		B8B11CCF25ADA554003CAA1D /* Chart.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8B11CCE25ADA554003CAA1D /* Chart.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -73,6 +74,7 @@
 		B8B11CAE259781C2003CAA1D /* PageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageViewController.swift; sourceTree = "<group>"; };
 		B8B11CB625978206003CAA1D /* PageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageView.swift; sourceTree = "<group>"; };
 		B8B11CC925AD72E6003CAA1D /* HexColor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HexColor.swift; sourceTree = "<group>"; };
+		B8B11CCE25ADA554003CAA1D /* Chart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Chart.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -183,6 +185,7 @@
 				B8B11CA325977679003CAA1D /* ReportView.swift */,
 				B8B11CA825977764003CAA1D /* HomeView.swift */,
 				B8B11CB625978206003CAA1D /* PageView.swift */,
+				B8B11CCE25ADA554003CAA1D /* Chart.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -348,6 +351,7 @@
 				B8B11C6A257F55D2003CAA1D /* EventRowView.swift in Sources */,
 				B8B11CAF259781C2003CAA1D /* PageViewController.swift in Sources */,
 				B8B11CB725978206003CAA1D /* PageView.swift in Sources */,
+				B8B11CCF25ADA554003CAA1D /* Chart.swift in Sources */,
 				B83BC9B3257F4F4100D2D252 /* SceneDelegate.swift in Sources */,
 				B8B11C942580AED1003CAA1D /* LocationManager.swift in Sources */,
 				B8B11CCA25AD72E6003CAA1D /* HexColor.swift in Sources */,

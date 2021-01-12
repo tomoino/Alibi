@@ -232,9 +232,16 @@ class ApiClient: ObservableObject {
                     } // event is not empty
                 }
                 
+                var length_sum = 0
                 for event_element in event_elements {
                     self.report[event_element.event]! += Int(event_element.length)
                 }
+                
+                for category in CATEGORIES {
+                    length_sum += self.report[category]!
+                }
+                self.report["SUM_HOUR"] = length_sum/60
+                self.report["SUM_MIN"] = length_sum - Int(length_sum/60) * 60
                 print(self.report)
             }
         })
