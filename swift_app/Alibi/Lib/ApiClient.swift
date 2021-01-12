@@ -266,7 +266,7 @@ class ApiClient: ObservableObject {
                 
                 for category in CATEGORIES {
                     let percent = CGFloat(Double(self.report[category]!) / Double(length_sum) * 100.0)
-                    self.report_chart.chartData.append(ChartData(color: Color(hex: COLORS[category] ?? 0xffffff), percent: percent, value: 0))
+                    self.report_chart.chartData.append(ChartData(color: Color(hex: COLORS[category] ?? 0xffffff), percent: percent, value: 0, event: category))
                 }
             }
         })
