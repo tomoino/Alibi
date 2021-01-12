@@ -117,26 +117,56 @@ struct EventCard: View {
     
     var body: some View {
         let y: CGFloat = CGFloat(68.7 * (event_element.hour + event_element.min/60.0))
-        let _h = CGFloat(69.5 * event_element.length / 60.0 - 8.0)
+        let _h = CGFloat(69.15 * event_element.length / 60.0 - 8.0)
         let h = event_element.length >= 30 ? _h: (event_element.length >= 20 ? 20: 12)
         let toppad = event_element.length >= 30 ? 5: (event_element.length >= 20 ? 2.5: 0)
+        // material design color: 300
+        let COLORS: [String: Int] = ["プロ研":0xFFB74D, // Orange
+                                     "回路理論":0x4FC3F7, // Light Blue
+                                     "多変量解析":0x7986CB, // Indigo
+                                     "ビジネス":0x4DB6AC, // Teal
+                                     "電生実験":0xFFF176, // Yellow
+                                     "OS":0xAED581, // Light Green
+                                     "論文読み":0xe57373, //Red
+                                     "開発環境構築":0xBA68C8, // Purple
+                                     "入浴":0x9E9E9E,
+                                     "食事":0x9E9E9E,
+                                     "睡眠":0x9E9E9E,
+                                     "インターン":0x9E9E9E,
+                                     "外出":0x9E9E9E]
+        // material design color: 300
+        let FONT_COLORS: [String: Int] = ["プロ研":0xf44336,
+                                     "回路理論":0xF06292,
+                                     "多変量解析":0xBA68C8,
+                                     "ビジネス":0x9575CD,
+                                     "電生実験":0x7986CB,
+                                     "OS":0x64B5F6,
+                                     "論文読み":0x4FC3F7,
+                                     "開発環境構築":0x4DD0E1,
+                                     "入浴":0x4DB6AC,
+                                     "食事":0x81C784,
+                                     "睡眠":0xAED581,
+                                     "インターン":0xDCE775,
+                                     "外出":0xFFF176]
         
         HStack(alignment: .top) {
             Text(event_element.event)
             .font(.system(size: 12, weight: .bold, design: .default))
-            .foregroundColor(.white)
+                .foregroundColor(Color(hex: 0xffffff))
             .frame(height: h, alignment: .top)
             .padding(EdgeInsets(top: CGFloat(toppad), leading: 10, bottom: 0, trailing: 10))
             Spacer()
         }
         .frame(maxWidth: .infinity, alignment: .top)
-        .background(Color(red: 32/255, green: 36/255, blue: 38/255))
-        .modifier(CardModifier())
+//        .background(Color(red: 32/255, green: 36/255, blue: 38/255))
+        .background(Color(hex: COLORS[event_element.event] ?? 0xdddddd, alpha: 0.7))
+        .modifier(CardModifier(color: Color(hex: FONT_COLORS[event_element.event] ?? 0xffffff)))
         .padding(EdgeInsets(top: y, leading: 70, bottom: 0, trailing: 12))
     }
 }
 
 struct CardModifier: ViewModifier {
+    let color: Color
     func body(content: Content) -> some View {
         content
             .cornerRadius(5)

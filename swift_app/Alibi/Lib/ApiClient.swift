@@ -39,8 +39,8 @@ class ApiClient: ObservableObject {
                 _events = try! JSONDecoder().decode([Event].self, from: data)
                 
                 var sleep_flag = 0 // 睡眠フラグ
-                var CATEGORIES = ["プロ研","回路理論","多変量解析","ビジネス","電生実験","OS","論文読み","開発環境構築"]
-                var REAL_EVENTS = ["入浴","食事","睡眠","インターン","外出"]
+                let CATEGORIES = ["プロ研","回路理論","多変量解析","ビジネス","電生実験","OS","論文読み","開発環境構築"]
+                let REAL_EVENTS = ["入浴","食事","睡眠","インターン","外出"]
                 
                 for _event in _events {
                     var event = _event
@@ -91,7 +91,6 @@ class ApiClient: ObservableObject {
                         } else { // 閲覧サイトから推定した作業内容がある場合
                         
                             let event_categories = event.event.components(separatedBy: ",")
-                            print(event_categories)
                             let pred_vec = event_categories.map{Double($0)!}
                             
                             let max_num = pred_vec.max()
@@ -106,7 +105,7 @@ class ApiClient: ObservableObject {
                             let last_event_element = event_elements[last_index]
                             
                             // 連続していたら
-                            if (last_event_element.event == event_name && (hour*60+min) - (last_event_element.hour*60+last_event_element.min+last_event_element.length) <= 60){
+                            if (last_event_element.event == event_name && (hour*60+min) - (last_event_element.hour*60+last_event_element.min+last_event_element.length) <= 120){
                                 event_elements[last_index].length = hour * 60 + min - (last_event_element.hour * 60 + last_event_element.min) + 10
                             } else {
                                 event_elements.append(EventElement(event: event_name, hour: hour, min: min, length: 10))
