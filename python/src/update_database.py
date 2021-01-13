@@ -17,13 +17,17 @@ tf.config.set_visible_devices(physical_devices[gpu_id], 'GPU')
 tf.config.experimental.set_memory_growth(physical_devices[gpu_id], True)
 
 # パラメタ
-FROM = "2020-12-11_14:00:00"
-TO = "2021-01-08_00:00:00"
-HISTORY_CSV = "../data/raw_history.csv"
+# FROM = "2020-12-11_14:00:00"
+# TO = "2021-01-08_00:00:00"
+# HISTORY_CSV = "../data/raw_history.csv"
 
 # FROM = "2020-12-11_14:20:00"
 # TO = "2020-12-12_00:00:00"
 # HISTORY_CSV = "../data/raw_history_test.csv"
+
+FROM = "2020-12-31_15:00:00"
+TO = "2021-01-08_00:00:00"
+HISTORY_CSV = "../data/raw_history_1.csv"
 
 MAX_LENGTH = 3000
 CATEGORIES = ["プロ研", "回路理論", "多変量解析", "ビジネス", "電生実験", "OS", "論文読み", "開発環境構築"]
@@ -35,7 +39,7 @@ def load_history(filepath):
         for l in f:
             row = l.replace("\n", "").split(",")
             try:
-                tdatetime = datetime.datetime.strptime(row[2], '%Y/%m/%d %H:%M')
+                tdatetime = datetime.datetime.strptime(row[2], '%Y/%m/%d %H:%M:%S')
                 url_list.append([row[0], tdatetime])  # url, time
             except:
                 continue
@@ -54,10 +58,13 @@ def get_text(url):
         script.decompose()
 
     text = soup.get_text()
+    
     lines = [line.strip() for line in text.splitlines()]
     text = "\n".join(line for line in lines if line)
     tagger = MeCab.Tagger("-Owakati")        
     text = tagger.parse(text)
+    if (not text):
+        return ""
     text = text.replace("\n", "")
 
     return text
