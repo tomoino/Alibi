@@ -8,22 +8,24 @@
 import SwiftUI
 
 struct TimelineView: View {
-    @State private var page = 13// 初期値
+    @State private var page = 0// 初期値
     var date = [Int]()
     var pages: [DayTimeline] = []
     @ObservedObject var event_elements = EventElements()
     @ObservedObject var apiClient = ApiClient()
  
     init(){
-//        event_elements = apiClient.getTimelines()
-        
         for j in [12, 1] {
             for i in 1 ... 31 {
+                if (j == 12 && i < 11) || (j == 1 && i > 7) {
+                    continue
+                }
+
                 var k = 2020
                 if j == 1 {
                     k = 2021
                 }
-                
+
                 pages.append(DayTimeline(year: k, month: j, day: i))
                 date.append(i)
             }
@@ -115,32 +117,48 @@ struct EventCard: View {
     
     var body: some View {
         let y: CGFloat = CGFloat(68.7 * (event_element.hour + event_element.min/60.0))
-        let _h = CGFloat(69.5 * event_element.length / 60.0 - 8.0)
+        let _h = CGFloat(69.15 * event_element.length / 60.0 - 8.0)
         let h = event_element.length >= 30 ? _h: (event_element.length >= 20 ? 20: 12)
         let toppad = event_element.length >= 30 ? 5: (event_element.length >= 20 ? 2.5: 0)
+        // material design color: 300
+        let COLORS: [String: Int] = ["プロ研":0xFFB74D, // Orange
+                                     "回路理論":0x4FC3F7, // Light Blue
+                                     "多変量解析":0x7986CB, // Indigo
+                                     "ビジネス":0x4DB6AC, // Teal
+                                     "電生実験":0xFFF176, // Yellow
+                                     "OS":0xAED581, // Light Green
+                                     "論文読み":0xe57373, //Red
+                                     "開発環境構築":0xBA68C8, // Purple
+                                     "入浴":0x9E9E9E,
+                                     "食事":0x9E9E9E,
+                                     "睡眠":0x9E9E9E,
+                                     "インターン":0x9E9E9E,
+                                     "外出":0x9E9E9E]
         
         HStack(alignment: .top) {
             Text(event_element.event)
             .font(.system(size: 12, weight: .bold, design: .default))
-            .foregroundColor(.white)
+                .foregroundColor(Color(hex: 0xffffff))
             .frame(height: h, alignment: .top)
             .padding(EdgeInsets(top: CGFloat(toppad), leading: 10, bottom: 0, trailing: 10))
             Spacer()
         }
         .frame(maxWidth: .infinity, alignment: .top)
-        .background(Color(red: 32/255, green: 36/255, blue: 38/255))
-        .modifier(CardModifier())
+//        .background(Color(red: 32/255, green: 36/255, blue: 38/255))
+        .background(Color(hex: COLORS[event_element.event] ?? 0xdddddd, alpha: 0.7))
+        .modifier(CardModifier(color: Color.white))
         .padding(EdgeInsets(top: y, leading: 70, bottom: 0, trailing: 12))
     }
 }
 
 struct CardModifier: ViewModifier {
+    let color: Color
     func body(content: Content) -> some View {
         content
             .cornerRadius(5)
             .overlay(
                 RoundedRectangle(cornerRadius: 5)
-                    .stroke(Color.white, lineWidth: 0.3)
+                    .stroke(color, lineWidth: 0.3)
             )
 //            .shadow(color: Color.black.opacity(0.2), radius: 20, x: 0, y: 0)
     }
