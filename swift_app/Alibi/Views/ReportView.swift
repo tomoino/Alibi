@@ -62,7 +62,8 @@ struct ReportCard: View {
             .font(.system(size: 16, weight: .bold, design: .default))
                 .foregroundColor(Color(hex: 0xffffff))
             .frame(height: h, alignment: .top)
-            .padding(EdgeInsets(top: CGFloat(15), leading: 10, bottom: 0, trailing: 0))
+            .padding(EdgeInsets(top: CGFloat(15), leading: 20, bottom: 0, trailing: 0))
+            
             Text("\(apiClient.report["SUM_HOUR"] ?? 0):\(apiClient.report["SUM_MIN"] ?? 0):00")
             .font(.system(size: 30, weight: .bold, design: .default))
                 .foregroundColor(Color(hex: 0xFFB74D))
@@ -90,7 +91,7 @@ struct PieChart: View {
             .font(.system(size: 16, weight: .bold, design: .default))
                 .foregroundColor(Color(hex: 0xffffff))
             .frame(height: 20, alignment: .top)
-            .padding(EdgeInsets(top: CGFloat(15), leading: 10, bottom: 0, trailing: 0))
+            .padding(EdgeInsets(top: CGFloat(15), leading: 5, bottom: 0, trailing: 0))
             
             DonutChart(charDataObj: apiClient.report_chart)
         }

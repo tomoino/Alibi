@@ -103,7 +103,7 @@ struct DonutChart : View {
                                 .onTapGesture {
                                     indexOfTappedSlice = indexOfTappedSlice == index * 2 + 1 ? -1 : index * 2 + 1
                                 }
-                                .font(indexOfTappedSlice == index * 2 + 2 ? .headline : .subheadline)
+                                .font(indexOfTappedSlice == index * 2 + 1 ? .headline : .subheadline)
                                 
     //                            Text(String(format: "%.2f", Double(charDataObj.chartData[index].percent))+"%")
     //                            .onTapGesture {
@@ -117,8 +117,8 @@ struct DonutChart : View {
                             }
                             .padding(8)
                             .frame(width: 150, alignment: .trailing)
-                } // HStack
-            } // ForEach
-        }
+                }// HStack
+            }// ForEach
+        }.padding(EdgeInsets(top: 25, leading: 0, bottom: 45, trailing: 0))  // ZStack
     }
 }
